@@ -243,20 +243,16 @@
     .clues-sidebar{ width:auto; border-left:none; border-top:1px solid rgba(201,168,76,0.3); }
   }
 
-  /* ---------- Layer 1: rotary dials ---------- */
+  /* ---------- Layer 1: letter wheels ---------- */
   .wheels{ display:flex; gap:28px; justify-content:center; margin:26px 0; flex-wrap:wrap; }
   .wheel{ text-align:center; }
-  .dial-svg{ width:128px; height:128px; overflow:visible; filter:drop-shadow(0 6px 12px rgba(0,0,0,0.6)); }
-  .dial-outer{ fill:#241c14; stroke:var(--gold); stroke-width:2.5; }
-  .dial-face{
-    fill:#1b1510; stroke:rgba(201,168,76,0.35); stroke-width:1;
+  .dial-box{
+    width:100px; height:100px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(180deg, var(--black-soft), #150f0b); border:2px solid var(--gold);
+    box-shadow:0 6px 12px rgba(0,0,0,0.6);
   }
-  .dial-rivet{ fill:var(--gold); opacity:0.55; }
-  .dial-ring{ transform-origin:100px 100px; transition:transform 0.4s cubic-bezier(.35,1.4,.4,1); }
-  .dial-letter{ font-family:var(--font-mono); font-size:11px; fill:rgba(201,168,76,0.5); }
-  .dial-center{ fill:var(--black-soft); stroke:var(--gold); stroke-width:1.5; }
-  .dial-current{ font-family:var(--font-mono); font-size:26px; fill:var(--gold-bright); transition:opacity 0.15s ease; }
-  .dial-pointer{ fill:var(--red-bright); filter:drop-shadow(0 0 4px rgba(178,58,58,0.8)); }
+  .dial-box.shake{ animation:shake 0.4s; }
+  .dial-current{ font-family:var(--font-mono); font-size:34px; color:var(--gold-bright); }
   .wheel-btns{ display:flex; justify-content:center; gap:8px; margin-top:10px; }
   .wheel-btns button{
     background:linear-gradient(180deg, var(--black-soft), #150f0b); border:1px solid var(--gold); color:var(--gold-bright);
