@@ -1,3 +1,5 @@
+/* Kleuren, lettertypes en schaduw als CSS-variabelen, zodat het hele
+   kleurenschema (rood/goud/perkament) op één plek aan te passen is. */
 :root{
     --red:#8B1A1A;
     --red-bright:#B23A3A;
@@ -52,6 +54,8 @@
     70%{ opacity:1; transform:scale(1.02); }
   }
 
+  /* Schermwissel-mechanisme: script.js zet enkel de "active" class op het
+     gewenste scherm (showScreen()); hier bepaalt CSS wat dat zichtbaar maakt. */
   .screen{ display:none; position:relative; z-index:1; flex:1; }
   .screen.active{ display:flex; flex-direction:column; }
 
@@ -144,6 +148,8 @@
     box-shadow:0 0 0 1px rgba(0,0,0,0.4), 0 30px 60px var(--shadow);
     position:relative; z-index:2;
   }
+  /* Gouden sterretjes (unicode \2726) in de hoeken van het introkader,
+     puur decoratief via ::before/::after zodat er geen extra HTML nodig is. */
   .intro-frame::before, .intro-frame::after{
     content:"\2726"; color:var(--gold); position:absolute; font-size:14px;
   }
@@ -325,6 +331,8 @@
   .house-info .house-desc{ font-size:11px; color:var(--parchment-dim); font-style:italic; }
 
   /* ---------- Layer 4: translation ---------- */
+  /* clip-path met onregelmatige punten geeft het perkament een gescheurde,
+     handgemaakte rand in plaats van een rechte rechthoek. */
   .manuscript-sheet{
     position:relative; margin:22px 0; padding:26px 22px 22px;
     background-image: linear-gradient(160deg, rgba(20,14,8,0.12) 0%, rgba(20,14,8,0.42) 100%);
@@ -375,6 +383,9 @@
   #screen-win h1{ color:var(--gold-bright); }
   #screen-lose h1{ color:var(--red-bright); }
 
+  /* Kluisdeur: twee panelen die pas bewegen zodra script.js de "open" class
+     toevoegt (met een dubbele requestAnimationFrame-vertraging, zie script.js,
+     zodat de transitie ook echt zichtbaar afspeelt). */
   .vault-door{ display:flex; width:200px; height:120px; margin:0 auto 22px; overflow:hidden; border:1px solid var(--gold); }
   .vault-door .panel{ flex:1; background:linear-gradient(90deg, var(--black-soft), #3a2e22); transition:transform 1.2s ease; position:relative; }
   .vault-door .panel::after{ content:"\2726"; position:absolute; top:50%; color:var(--gold); font-size:18px; transform:translateY(-50%); }
@@ -405,6 +416,8 @@
   .lb-list li .lb-time{ color:var(--gold-bright); }
   .lb-empty{ color:var(--parchment-dim); font-style:italic; text-align:center; margin:20px 0; }
 
+  /* Volledig-scherm gouden flits die script.js (flashSuccess) bij elke
+     opgeloste laag afvuurt, als directe visuele beloning voor een juiste zet. */
   .success-flash{
     position:fixed; inset:0; background:radial-gradient(circle, rgba(201,168,76,0.35), transparent 60%);
     pointer-events:none; opacity:0; z-index:5;
@@ -412,11 +425,12 @@
   .success-flash.play{ animation:flash-out 0.9s ease; }
   @keyframes flash-out{ 0%{opacity:1;} 100%{opacity:0;} }
 
-  /* Reduced motion */
+  /* Zet alle animaties/transities vrijwel uit voor gebruikers die
+     "verminderde beweging" verkiezen in hun systeeminstellingen. */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms;
+      animation-iteration-count: 1;
+      transition-duration: 0.01ms;
     }
   }

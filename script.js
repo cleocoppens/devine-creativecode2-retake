@@ -1,30 +1,36 @@
 (() => {
   "use strict";
 
-  const TOTAL_TIME = 300; // 5 minuten
-  const HINT_PENALTY = 60;
-  const LB_KEY = "verbodenKluisLeaderboard";
+  // ---------- config ----------
+  const TOTAL_TIME = 300; // countdown duur in seconden (5 minuten)
+  const HINT_PENALTY = 60; // seconden die een hint van de resterende tijd afhaalt
+  const LB_KEY = "verbodenKluisLeaderboard"; // localStorage-sleutel voor het leaderboard
 
+  // ---------- game state ----------
+  // Centraal object dat de volledige voortgang van een sessie bijhoudt.
   const state = {
-    layer: 0,
-    timeLeft: TOTAL_TIME,
-    timerId: null,
-    hintsLeft: 3,
-    running: false,
-    fragments: ["", "", "", ""],
-    startTimestamp: null,
-    elapsed: 0,
+    layer: 0, // index van de huidige laag (0 t/m 4)
+    timeLeft: TOTAL_TIME, // resterende seconden op de countdown
+    timerId: null, // referentie naar de actieve setInterval, nodig om te kunnen stoppen
+    hintsLeft: 3, // aantal hints dat de speler nog mag gebruiken
+    running: false, // of de timer op dit moment loopt
+    fragments: ["", "", "", ""], // opgeloste code per laag (I t/m IV), gebruikt voor de finale formule
+    startTimestamp: null, // moment waarop de huidige poging begon
+    elapsed: 0, // verstreken seconden sinds start, wordt de eindtijd bij winst
   };
 
   // ---------- generic helpers ----------
+  // Korte alias voor querySelector/querySelectorAll, scheelt herhaling overal in dit bestand.
   const $ = (sel) => document.querySelector(sel);
   const $all = (sel) => Array.from(document.querySelectorAll(sel));
 
+  // Wisselt van scherm door de "active" class te verplaatsen; CSS regelt de zichtbaarheid.
   const showScreen = (id) => {
     $all(".screen").forEach((s) => s.classList.remove("active"));
     $(`#${id}`).classList.add("active");
   };
 
+  // Fisher-Yates shuffle: husselt een array zonder het origineel aan te passen.
   const shuffle = (arr) => {
     const a = [...arr];
     for (let i = a.length - 1; i > 0; i--) {
@@ -34,6 +40,7 @@
     return a;
   };
 
+  // Zet seconden om naar een leesbare MM:SS-notatie voor de timer en het leaderboard.
   const formatTime = (secs) => {
     const s = Math.max(0, secs);
     const m = Math.floor(s / 60).toString().padStart(2, "0");
@@ -41,6 +48,9 @@
     return `${m}:${r}`;
   };
 
+  // Speelt de gouden flits-animatie af bij elke correcte oplossing (micro-interactie).
+  // De reflow via offsetWidth dwingt de browser om de animatie opnieuw te starten,
+  // ook als de vorige flits nog niet helemaal was uitgefade.
   const flashSuccess = () => {
     const el = $("#success-flash");
     el.classList.remove("play");
@@ -49,12 +59,16 @@
   };
 
   // ---------- timer ----------
+  // Ververst de klokweergave in de header en schakelt de rode "warning"-stijl
+  // in zodra er nog maar 60 seconden of minder over zijn.
   const updateTimerDisplay = () => {
     const wrap = $("#timer-display");
     wrap.innerHTML = `<span class="timer-label">Tijd tot zuivering</span>${formatTime(state.timeLeft)}`;
     wrap.classList.toggle("warning", state.timeLeft <= 60);
   };
 
+  // Start de countdown: elke seconde gaat timeLeft omlaag en elapsed omhoog.
+  // Bereikt de klok nul, dan stopt de timer en verliest de speler.
   const startTimer = () => {
     state.running = true;
     state.startTimestamp = Date.now();
@@ -69,12 +83,16 @@
     }, 1000);
   };
 
+  // Zet de lopende setInterval stil. Belangrijk om te doen bij winst/verlies/herstart,
+  // anders blijven er "spooktimers" doorlopen op de achtergrond.
   const stopTimer = () => {
     state.running = false;
     if (state.timerId) clearInterval(state.timerId);
     state.timerId = null;
   };
 
+  // Trekt de tijdstraf van een hint af van de klok en laat de timer even
+  // in de "warning"-stijl flitsen als visuele feedback op het tijdverlies.
   const applyPenalty = (secs) => {
     state.timeLeft = Math.max(1, state.timeLeft - secs);
     updateTimerDisplay();
@@ -88,6 +106,8 @@
   // ---------- progress + clues ----------
   const LAYER_NAMES = ["Coderadepuzzel", "Boekclassificatie", "Waszegelarchief", "Manuscriptvertaling", "De Finale Reeks"];
 
+  // Bouwt de rij voortgangsstippen in de header: opgeloste lagen krijgen "done",
+  // de actieve laag krijgt "current" (en pulseert via CSS).
   const renderProgress = () => {
     const dots = $("#progress-dots");
     dots.innerHTML = "";
@@ -98,6 +118,8 @@
     });
   };
 
+  // Toont de tot nu toe verzamelde fragment-codes in de zijbalk.
+  // Nog niet opgeloste lagen tonen "??????" zodat spelers zien wat er nog ontbreekt.
   const renderClues = () => {
     const list = $("#clues-list");
     list.innerHTML = "";
@@ -112,6 +134,7 @@
   };
 
   // ---------- hint system ----------
+  // Eén hint per laag, op index gekoppeld aan state.layer.
   const HINTS = [
     "Let op de eerste letter van elke zin in de tekst hierboven.",
     "De boeken staan niet op alfabet, maar op ouderdom — kijk naar het jaartal op elke rug.",
@@ -120,6 +143,9 @@
     "Kijk naar je Verzamelde Aanwijzingen rechts in beeld en volg de formule exact, teken voor teken.",
   ];
 
+  // Verwerkt een klik op de hintknop: telt hints af, trekt de tijdstraf af,
+  // toont de hinttekst in het paneel van de huidige laag en schudt de knop
+  // als micro-interactie. Zijn alle hints op, dan wordt de knop uitgeschakeld.
   const useHint = () => {
     if (state.hintsLeft <= 0) return;
     state.hintsLeft -= 1;
@@ -139,6 +165,8 @@
   };
 
   // ---------- layer advance ----------
+  // Wisselt naar laag n: werkt de voortgang/zijbalk bij en roept de juiste
+  // render-functie op (renderLayer1 t/m renderLayer5 staan verderop in dit bestand).
   const goToLayer = (n) => {
     state.layer = n;
     renderProgress();
@@ -148,6 +176,10 @@
     renderers[n](panelHtml);
   };
 
+  // Wordt aangeroepen zodra een laag correct is opgelost: slaat de fragmentcode op,
+  // speelt de succes-flits af en toont positieve feedback. Na een korte vertraging
+  // (zodat de speler de feedback kan lezen) gaat het spel naar de volgende laag,
+  // of naar het winscherm als dit de laatste laag was.
   const solveLayer = (fragmentValue, feedbackMsg) => {
     state.fragments[state.layer] = fragmentValue;
     flashSuccess();
@@ -166,6 +198,7 @@
     }, 1300);
   };
 
+  // Toont foutfeedback onder de huidige laag (rode tekst + shake via CSS).
   const showBadFeedback = (msg) => {
     const fb = $("#layer-feedback");
     if (fb) {
@@ -176,11 +209,16 @@
   };
 
   // ================= LAYER 1: Coderadepuzzel =================
-  const wheelState = [0, 0, 0];
+  // Drie ronddraaiende letterwielen die de speler naar de code "ARX" moet zetten.
+  // De code staat verstopt als acrostichon: de eerste letter van elke zin in de
+  // flavourtekst (Aan.../Radeloos.../X markeert...) spelt A-R-X.
+  const wheelState = [0, 0, 0]; // huidige letterindex (0-25) per wiel
   const ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const TARGET_1 = "ARX";
-  const ANGLE_STEP = 360 / ALPHA.length;
+  const ANGLE_STEP = 360 / ALPHA.length; // graden tussen twee opeenvolgende letters op het wiel
 
+  // Genereert de SVG voor één draaibaar letterwiel: een cirkel van 26 letters die
+  // via CSS-transform geroteerd wordt tot de huidige letter bovenaan staat.
   const buildDialSVG = (idx) => {
     const cx = 100, cy = 100, r = 78;
     const letters = ALPHA.split("").map((l, i) => {
@@ -190,6 +228,7 @@
       const y = (cy + r * Math.sin(rad)).toFixed(1);
       return `<text x="${x}" y="${y}" transform="rotate(${angle.toFixed(2)} ${x} ${y})" text-anchor="middle" class="dial-letter">${l}</text>`;
     }).join("");
+    // vier sierklinknagels rond de rand van het wiel, puur decoratief
     const rivets = [45, 135, 225, 315].map((a) => {
       const rad = (a * Math.PI) / 180;
       const x = (cx + 90 * Math.cos(rad)).toFixed(1);
@@ -209,6 +248,8 @@
     `;
   };
 
+  // Bouwt laag 1 op: reset de wielen naar "A", rendert de puzzel-HTML en koppelt
+  // de klik-events voor de ◀/▶ knoppen (roteren) en de "Ontgrendel"-knop (controle).
   const renderLayer1 = (panelHtml) => {
     wheelState[0] = 0; wheelState[1] = 0; wheelState[2] = 0;
     $("#layer-content").innerHTML = `
@@ -242,6 +283,8 @@
       `;
       wrap.appendChild(w);
     });
+    // Elke ◀/▶ knop draait zijn eigen wiel één letter verder en laat de
+    // middelste letter kort fade-en zodat de wissel niet abrupt aanvoelt.
     $all(".wheel-btns button").forEach((btn) => {
       btn.addEventListener("click", () => {
         const idx = parseInt(btn.dataset.idx, 10);
@@ -268,6 +311,8 @@
   };
 
   // ================= LAYER 2: Boekclassificatie =================
+  // Zes boeken moeten in chronologische volgorde (jaartal) worden aangeklikt.
+  // De eerste letters van elk boek, gelezen van oud naar jong, spellen "GEHEIM".
   const BOOKS = [
     { id: 0, title: "Chronicon Umbrae", year: 1350, letter: "G", color: "#7a2323", symbol: "☾" },
     { id: 1, title: "Liber Serpentis", year: 1402, letter: "E", color: "#1c2b45", symbol: "☿" },
@@ -276,8 +321,9 @@
     { id: 4, title: "Speculum Tenebris", year: 1601, letter: "I", color: "#26344a", symbol: "✶" },
     { id: 5, title: "Testamentum Umbrae", year: 1699, letter: "M", color: "#4a3a26", symbol: "♄" },
   ];
-  let bookSelection = [];
+  let bookSelection = []; // volgorde waarin de speler tot nu toe boeken heeft aangeklikt (array van id's)
 
+  // Bouwt laag 2 op: reset de selectie en rendert de lege plank + het boekenstapeltje.
   const renderLayer2 = (panelHtml) => {
     bookSelection = [];
     $("#layer-content").innerHTML = `
@@ -299,6 +345,8 @@
     renderBookPile();
   };
 
+  // Tekent de zes lege/gevulde plank-slots met pijltjes ertussen, op basis van
+  // hoeveel boeken de speler al gekozen heeft (bookSelection.length).
   const renderShelf = () => {
     const shelf = $("#shelf");
     shelf.innerHTML = "";
@@ -317,6 +365,9 @@
     }
   };
 
+  // Tekent de stapel klikbare boekkaarten. De volgorde van de stapel wordt één keer
+  // gehusseld en daarna vastgehouden in een data-attribuut, zodat een re-render
+  // (bv. na een foute poging) de kaarten niet opnieuw door elkaar gooit.
   const renderBookPile = () => {
     const pile = $("#book-pile");
     pile.innerHTML = "";
@@ -334,13 +385,16 @@
     });
   };
 
+  // Verwerkt een klik op een boek: voegt het toe aan de selectie en checkt de
+  // volgorde zodra alle zes gekozen zijn. Correct → los de laag op en toon de
+  // gevormde code. Fout → shake alle slots en reset de selectie na een korte pauze.
   const onBookClick = (id) => {
     if (bookSelection.includes(id) || bookSelection.length >= 6) return;
     bookSelection.push(id);
     renderShelf();
     renderBookPile();
     if (bookSelection.length === 6) {
-      const correctOrder = [0, 1, 2, 3, 4, 5];
+      const correctOrder = [0, 1, 2, 3, 4, 5]; // boeken staan al chronologisch gesorteerd op id
       const isCorrect = bookSelection.every((v, i) => v === correctOrder[i]);
       if (isCorrect) {
         const code = correctOrder.map((id2) => BOOKS.find((b) => b.id === id2).letter).join("");
@@ -359,6 +413,9 @@
   };
 
   // ================= LAYER 3: Waszegelarchief =================
+  // Vier fragmenten (elk met een dier-symbool en een korte omschrijving) moeten
+  // gekoppeld worden aan het bijbehorende adellijke huis. Zijn alle vier juist
+  // gekoppeld, dan vormen de huis-cijfers samen de code voor deze laag.
   const HOUSES = [
     { name: "Huis Leeuwenhart", digit: "7", symbol: "🦁" },
     { name: "Huis Adelaarsnest", digit: "3", symbol: "🦅" },
@@ -371,9 +428,11 @@
     { id: 2, symbol: "🏰", text: "De muren van dit huis zijn nooit gevallen.", houseIdx: 2 },
     { id: 3, symbol: "🦉", text: "Tussen de takken sluimert het woud.", houseIdx: 3 },
   ];
-  let sealAssignments = {};
-  let selectedFrag = null;
+  let sealAssignments = {}; // { fragmentId: houseIdx } voor elk al correct gekoppeld fragment
+  let selectedFrag = null; // id van het fragment dat de speler nu geselecteerd heeft
 
+  // Bouwt laag 3 op: reset de koppelingen, hussel de fragmenten (zodat ze niet
+  // steeds in dezelfde volgorde als de huizen staan) en render beide kolommen.
   const renderLayer3 = (panelHtml) => {
     sealAssignments = {};
     selectedFrag = null;
@@ -418,6 +477,8 @@
     });
   };
 
+  // Selecteert een fragmentkaart (visueel gemarkeerd) zodat de speler daarna
+  // een huis kan aanklikken om de koppeling te maken.
   const onFragClick = (fragId, cardEl) => {
     if (cardEl.classList.contains("solved")) return;
     $all(".frag-card").forEach((c) => c.classList.remove("selected"));
@@ -425,6 +486,10 @@
     selectedFrag = fragId;
   };
 
+  // Verwerkt een klik op een huis: bij een juiste koppeling worden fragment en
+  // huis als "solved" gemarkeerd en verschijnt het dier-symbool op het schild.
+  // Zijn alle vier gekoppeld, dan wordt de laag opgelost. Bij een foute koppeling
+  // schudden beide elementen kort en wordt de selectie leeggemaakt.
   const onHouseClick = (houseIdx, btnEl) => {
     if (selectedFrag === null || btnEl.classList.contains("solved")) return;
     const frag = FRAGMENTS.find((f) => f.id === selectedFrag);
@@ -453,6 +518,9 @@
   };
 
   // ================= LAYER 4: Manuscriptvertaling =================
+  // Een simpel substitutie-geheimschrift: elk symbool staat voor één vaste letter.
+  // De speler krijgt het gecodeerde woord ("VERITAS") plus een legenda en moet
+  // het antwoord met de hand ontcijferen en intypen.
   const CIPHER = [
     { sym: "◆", letter: "V" },
     { sym: "●", letter: "E" },
@@ -464,6 +532,8 @@
   ];
   const TARGET_4 = "VERITAS";
 
+  // Bouwt laag 4 op: hussel de legenda-volgorde (puur cosmetisch, de koppeling
+  // symbool↔letter blijft hetzelfde) en zet het doelwoord om in symbolen.
   const renderLayer4 = (panelHtml) => {
     const legend = shuffle(CIPHER);
     const encoded = TARGET_4.split("").map((l) => CIPHER.find((c) => c.letter === l).sym).join(" ");
@@ -496,6 +566,9 @@
       item.innerHTML = `<span class="sym">${c.sym}</span>= ${c.letter}`;
       legendEl.appendChild(item);
     });
+    // Formulier wordt afgehandeld met FormData zodat de invoer op de juiste
+    // manier (via het name-attribuut "answer") wordt uitgelezen, zoals de
+    // cursus voorschrijft. preventDefault voorkomt de standaard paginaherlaad.
     $("#form4").addEventListener("submit", (e) => {
       e.preventDefault();
       const formData = new FormData(e.currentTarget);
@@ -513,6 +586,8 @@
   };
 
   // ================= LAYER 5: De Finale Reeks =================
+  // Decoratieve mandala-achtergrond (puur SVG, geen puzzel-logica) achter de
+  // fragment-overzichtsvakjes van laag 5.
   const MANDALA_SVG = `
     <svg viewBox="0 0 300 300" class="mandala-bg">
       <circle cx="150" cy="150" r="140" fill="none" stroke="var(--gold)" stroke-width="1"/>
@@ -529,6 +604,9 @@
     </svg>
   `;
 
+  // Tekent de vier rijen met vakjes die tonen welke fragment-codes de speler al
+  // heeft (gevuld) en welke er nog ontbreken (vraagtekens), als geheugensteun
+  // voor het invullen van de Meestercode-formule.
   const renderFragmentRows = () => {
     const labels = [
       { label: "Laag I — Coderadepuzzel", len: 3 },
@@ -544,6 +622,10 @@
     }).join("");
   };
 
+  // Bouwt laag 5 op: berekent vooraf de correcte Meestercode uit de vier
+  // verzamelde fragmenten (laatste letter van I + volledige code van II +
+  // laatste cijfer van III + eerste 3 letters van IV) en toont de formule
+  // expliciet, zodat de speler de puzzel zelf kan samenstellen.
   const renderLayer5 = (panelHtml) => {
     const finalCode =
       state.fragments[0].slice(-1) +
@@ -577,6 +659,7 @@
       e.preventDefault();
       const formData = new FormData(e.currentTarget);
       const { answer } = Object.fromEntries(formData);
+      // spaties/streepjes worden genegeerd zodat opmaakverschillen niet fataal zijn
       const val = (answer || "").trim().toUpperCase().replace(/[\s-]/g, "");
       if (val === finalCode.toUpperCase()) {
         solveLayer(finalCode, "De kluisdeur ontgrendelt met een diepe, mechanische zucht...");
@@ -590,6 +673,10 @@
   };
 
   // ---------- win / lose ----------
+  // Stopt de timer, toont het winscherm en zet de eindtijd neer.
+  // De kluisdeur-animatie wordt bewust met een dubbele requestAnimationFrame
+  // getriggerd: zonder die truc start de overgang (display:none → flex) en de
+  // "open"-class tegelijk, waardoor de browser de animatie niet zichtbaar afspeelt.
   const winGame = () => {
     stopTimer();
     showScreen("screen-win");
@@ -599,11 +686,14 @@
     requestAnimationFrame(() => requestAnimationFrame(() => door.classList.add("open")));
   };
 
+  // Toont het verliesscherm wanneer de timer op nul komt.
   const loseGame = () => {
     showScreen("screen-lose");
   };
 
   // ---------- leaderboard ----------
+  // Leest het opgeslagen leaderboard uit localStorage. Bij ontbrekende of
+  // corrupte data wordt gewoon een lege lijst teruggegeven.
   const getLeaderboard = () => {
     try {
       const raw = localStorage.getItem(LB_KEY);
@@ -613,6 +703,8 @@
     }
   };
 
+  // Voegt een nieuwe score toe, sorteert op tijd (snelste eerst) en bewaart
+  // enkel de beste 10 in localStorage.
   const saveScore = (name) => {
     const scores = getLeaderboard();
     scores.push({ name: name.slice(0, 18) || "Anoniem", time: state.elapsed, date: new Date().toISOString() });
@@ -620,6 +712,8 @@
     localStorage.setItem(LB_KEY, JSON.stringify(scores.slice(0, 10)));
   };
 
+  // Tekent het leaderboard-scherm: een lege-staat bericht als er nog geen
+  // scores zijn, anders een genummerde lijst met naam en tijd.
   const renderLeaderboard = () => {
     const scores = getLeaderboard();
     const content = $("#lb-content");
@@ -639,6 +733,7 @@
   };
 
   // ---------- reset / init ----------
+  // Zet alle spelstatus terug naar de beginwaarden, klaar voor een nieuwe poging.
   const resetState = () => {
     stopTimer();
     state.layer = 0;
@@ -650,6 +745,8 @@
     $("#btn-hint").disabled = false;
   };
 
+  // Start een nieuwe poging: reset alles, toon het spelscherm, ga naar laag 1
+  // en laat de countdown lopen.
   const beginGame = () => {
     resetState();
     updateTimerDisplay();
@@ -659,11 +756,16 @@
   };
 
   // ---------- event wiring ----------
+  // Koppelt alle statische knoppen (die al in de HTML staan) aan hun handler.
+  // De knoppen die per laag dynamisch worden aangemaakt, krijgen hun eigen
+  // listener in de renderLayerX-functies hierboven.
   $("#btn-start").addEventListener("click", beginGame);
   $("#btn-show-leaderboard").addEventListener("click", () => { renderLeaderboard(); showScreen("screen-leaderboard"); });
   $("#btn-lb-back").addEventListener("click", () => showScreen("screen-intro"));
   $("#btn-hint").addEventListener("click", useHint);
 
+  // Naam-formulier op het winscherm: bewaart de score en vervangt het formulier
+  // door een bevestigingstekst zodat niet twee keer dezelfde tijd kan worden opgeslagen.
   $("#score-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -676,5 +778,6 @@
   $("#btn-lose-again").addEventListener("click", beginGame);
   $("#btn-lose-leaderboard").addEventListener("click", () => { renderLeaderboard(); showScreen("screen-leaderboard"); });
 
+  // Toon meteen "05:00" bij het laden van de pagina, nog voordat er gespeeld wordt.
   updateTimerDisplay();
 })();

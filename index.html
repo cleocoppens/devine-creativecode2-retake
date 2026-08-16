@@ -8,6 +8,8 @@
 </head>
 <body>
 <div id="app">
+  <!-- Decoratieve achtergrondlagen: subtiel rasterpatroon + twee flikkerende
+       fakkelgloed-cirkels, en de gouden flits die bij elke opgeloste laag oplicht -->
   <div class="vault-bg"></div>
   <div class="torchlight"></div>
   <div class="torchlight two"></div>
@@ -61,9 +63,12 @@
       </div>
     </header>
     <div class="game-main">
+      <!-- #layer-content is leeg in de HTML: script.js vult dit per laag
+           met de juiste puzzel-markup (renderLayer1 t/m renderLayer5) -->
       <div id="layer-content"></div>
       <aside class="clues-sidebar">
         <h3>Verzamelde Aanwijzingen</h3>
+        <!-- wordt gevuld door renderClues() in script.js -->
         <div id="clues-list"></div>
       </aside>
     </div>
@@ -72,6 +77,8 @@
   <!-- WIN -->
   <section id="screen-win" class="screen vault-light">
     <div class="end-frame">
+      <!-- twee panelen die script.js (winGame) via de "open" class laat
+           uiteenschuiven zodra dit scherm actief wordt -->
       <div class="vault-door"><div class="panel left"></div><div class="panel right"></div></div>
       <h1>Ontsnapt</h1>
       <p>De kluisdeur glijdt open. Boven je hoofd dooft het rode alarmlicht.
