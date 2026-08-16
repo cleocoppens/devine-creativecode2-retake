@@ -3,215 +3,117 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Meridian — De Laatste Nacht van de Kloktoren</title>
+<title>De Verboden Kluis — Escape Room</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <div id="app">
+  <div class="vault-bg"></div>
+  <div class="torchlight"></div>
+  <div class="torchlight two"></div>
+  <div class="success-flash" id="success-flash"></div>
 
-  <!-- ===================== INTRO SCREEN ===================== -->
-  <section id="screen-intro" class="screen active">
-    <div class="intro-bg" aria-hidden="true">
-      <div class="cog cog--1"></div>
-      <div class="cog cog--2"></div>
-      <div class="cog cog--3"></div>
+  <!-- INTRO -->
+  <section id="screen-intro" class="screen active stone-corridor">
+    <div class="layers-scroll parchment-texture">
+      <span class="ink-blot" style="width:16px;height:16px;bottom:14px;right:12px;"></span>
+      <span class="ink-spatter" style="width:2px;height:2px;bottom:34px;right:26px;"></span>
+      <h4>Vijf Beveiligingslagen</h4>
+      <ul>
+        <li><span class="ls-icon">I</span>Coderadepuzzel</li>
+        <li><span class="ls-icon">II</span>Boekclassificatie</li>
+        <li><span class="ls-icon">III</span>Waszegelarchief</li>
+        <li><span class="ls-icon">IV</span>Manuscriptvertaling</li>
+        <li><span class="ls-icon">V</span>De Finale Reeks</li>
+      </ul>
     </div>
-    <div class="intro-content">
-      <p class="eyebrow">Meridian · 23:41</p>
-      <h1 class="title-display">DE LAATSTE NACHT<br>VAN DE KLOKTOREN</h1>
-      <p class="story-text">
-        Je bent binnengeglipt in de verboden kloktoren van Meridian, op zoek naar het legendarische
-        Gouden Uurwerk. Maar het gebouw voelt je aanwezigheid. Om middernacht sluit het mechanisme
-        zichzelf voorgoed af — en alles wat zich dan nog binnen de muren bevindt, blijft er tot de
-        volgende volle maan. <strong>Een jaar van duisternis.</strong>
-      </p>
-      <p class="story-text">
-        Vier zegels houden de poort naar buiten gesloten. Ontrafel ze voordat de grote wijzer
-        zijn laatste ronde voltooit.
-      </p>
-      <button id="btn-start" class="btn btn--brass" type="button">Betreed de toren</button>
 
-      <div class="leaderboard-preview">
-        <h2 class="label-eyebrow">Snelste ontsnappingen</h2>
-        <ol id="leaderboard-intro" class="leaderboard-list"></ol>
+    <div class="intro-frame">
+      <div class="eyebrow">Universiteitsbibliotheek · Onderarchief -3</div>
+      <h1>De Verboden Kluis</h1>
+      <div class="intro-story">
+        Je bent leerling-archivaris. Terwijl je laat op de avond een oud manuscript
+        terugbrengt, valt de deur van de <strong>Verboden Sectie</strong> achter je in het slot.
+        Ergens in de muren klikt een relais. Een koude, mechanische stem echoot door
+        de gangen: <em>"Indringer gedetecteerd. Zuiveringsprocedure gestart."</em>
+        <br><br>
+        Het eeuwenoude bewakingssysteem van het archief heeft je gevonden.
+        Vijf beveiligingslagen scheiden je van de uitgang. Ontcijfer ze, of blijf voor
+        altijd onderdeel van de collectie.
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-start" type="button">Begin de ontsnapping</button>
+        <button class="btn" id="btn-show-leaderboard" type="button">Archief der Snelsten</button>
       </div>
     </div>
   </section>
 
-  <!-- ===================== GAME SCREEN ===================== -->
-  <section id="screen-game" class="screen">
-
-    <header class="hud">
-      <div class="hud-clock" id="hud-clock" title="Resterende tijd">
-        <svg class="hud-clock__ring" viewBox="0 0 120 120">
-          <circle class="hud-clock__track" cx="60" cy="60" r="54"></circle>
-          <circle id="hud-clock__progress" class="hud-clock__progress" cx="60" cy="60" r="54"></circle>
-        </svg>
-        <span id="hud-time" class="hud-clock__time">12:00</span>
+  <!-- GAME -->
+  <section id="screen-game" class="screen stone-corridor">
+    <header class="game-header">
+      <div class="progress-dots" id="progress-dots"></div>
+      <div class="timer-wrap" id="timer-display">
+        <span class="timer-label">Tijd tot zuivering</span>
+        05:00
       </div>
-
-      <div class="hud-seals" id="hud-seals" aria-label="Verzamelde zegels">
-        <div class="seal" data-seal="clock"><span class="seal__icon">⏳</span><span class="seal__digit">?</span></div>
-        <div class="seal" data-seal="gear"><span class="seal__icon">⚙</span><span class="seal__digit">?</span></div>
-        <div class="seal" data-seal="bell"><span class="seal__icon">🔔</span><span class="seal__digit">?</span></div>
-        <div class="seal" data-seal="riddle"><span class="seal__icon">📜</span><span class="seal__digit">?</span></div>
+      <div class="hint-area">
+        <button class="hint-btn" id="btn-hint" type="button">💡 Hint (<span id="hints-left">3</span> over)</button>
       </div>
-
-      <button id="btn-hint" class="btn btn--hint" type="button">
-        Hint <span id="hint-count">(3)</span>
-      </button>
     </header>
-
-    <main class="stage-area">
-
-      <!-- STAGE 1 : CLOCK -->
-      <article class="stage active" data-stage="clock">
-        <p class="stage-eyebrow">Zegel I · De Wijzerplaat</p>
-        <h2 class="stage-title">Het stilgevallen uurwerk</h2>
-        <p class="stage-text">
-          Een verkoold dagboek ligt open op de vensterbank. Er staat: <em>"Het uurwerk zou voorgoed
-          breken op twaalf minuten voor middernacht, gemeten in de oude achturige telling —
-          elf uur en achtenveertig minuten."</em> Zet de wijzerplaat op dat tijdstip om het zegel te breken.
-        </p>
-        <div class="clock-input">
-          <div class="stepper">
-            <button class="stepper__btn" data-clock="hour" data-dir="1" type="button">▲</button>
-            <span id="clock-hour" class="stepper__value">00</span>
-            <button class="stepper__btn" data-clock="hour" data-dir="-1" type="button">▼</button>
-          </div>
-          <span class="stepper__colon">:</span>
-          <div class="stepper">
-            <button class="stepper__btn" data-clock="minute" data-dir="1" type="button">▲</button>
-            <span id="clock-minute" class="stepper__value">00</span>
-            <button class="stepper__btn" data-clock="minute" data-dir="-1" type="button">▼</button>
-          </div>
-        </div>
-        <button id="btn-clock-check" class="btn btn--brass" type="button">Vergrendel wijzers</button>
-        <p class="stage-feedback" id="feedback-clock"></p>
-      </article>
-
-      <!-- STAGE 2 : GEARS -->
-      <article class="stage" data-stage="gear">
-        <p class="stage-eyebrow">Zegel II · Het Radarwerk</p>
-        <h2 class="stage-title">Drie tandwielen, drie tekens</h2>
-        <p class="stage-text" id="gear-clue"></p>
-        <div class="gears" id="gears"></div>
-        <button id="btn-gear-check" class="btn btn--brass" type="button">Vergrendel tandwielen</button>
-        <p class="stage-feedback" id="feedback-gear"></p>
-      </article>
-
-      <!-- STAGE 3 : BELLS -->
-      <article class="stage" data-stage="bell">
-        <p class="stage-eyebrow">Zegel III · Het Klokkenspel</p>
-        <h2 class="stage-title">Herhaal de melodie van de klokken</h2>
-        <p class="stage-text">
-          Luister naar de volgorde waarin de klokken luiden, en speel ze in dezelfde volgorde na.
-        </p>
-        <button id="btn-bell-play" class="btn btn--ghost" type="button">▶ Luister naar het klokkenspel</button>
-        <div class="bells" id="bells">
-          <button class="bell" data-bell="0" type="button" style="--bell-color:#c9a24b"></button>
-          <button class="bell" data-bell="1" type="button" style="--bell-color:#4a8f8c"></button>
-          <button class="bell" data-bell="2" type="button" style="--bell-color:#b5651d"></button>
-          <button class="bell" data-bell="3" type="button" style="--bell-color:#8f4a8c"></button>
-        </div>
-        <p class="stage-feedback" id="feedback-bell"></p>
-      </article>
-
-      <!-- STAGE 4 : RIDDLE -->
-      <article class="stage" data-stage="riddle">
-        <p class="stage-eyebrow">Zegel IV · Het Raadsel</p>
-        <h2 class="stage-title">De klokkenmaker vraagt je iets</h2>
-        <p class="stage-text stage-text--riddle">
-          "Ik word groter zonder te groeien.<br>
-          Ik verstrijk zonder ooit te bewegen.<br>
-          Niemand kan mij vasthouden,<br>
-          toch verspilt iedereen mij weleens.<br>
-          Wat ben ik?"
-        </p>
-        <form id="form-riddle" class="riddle-form">
-          <label for="riddle-input" class="visually-hidden">Jouw antwoord</label>
-          <input id="riddle-input" name="riddle" type="text" autocomplete="off" placeholder="Jouw antwoord…" required>
-          <button class="btn btn--brass" type="submit">Antwoord</button>
-        </form>
-        <p class="stage-feedback" id="feedback-riddle"></p>
-      </article>
-
-      <!-- STAGE 5 : FINAL GATE -->
-      <article class="stage" data-stage="gate">
-        <p class="stage-eyebrow">De Poort</p>
-        <h2 class="stage-title">Voeg de vier zegels samen</h2>
-        <p class="stage-text">
-          Elk gebroken zegel liet een cijfer achter. Voer ze in op de juiste plek van de poort.
-        </p>
-        <form id="form-gate" class="gate-form">
-          <div class="gate-field">
-            <span class="gate-field__icon">⏳</span>
-            <input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" data-gate="clock" required>
-          </div>
-          <div class="gate-field">
-            <span class="gate-field__icon">⚙</span>
-            <input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" data-gate="gear" required>
-          </div>
-          <div class="gate-field">
-            <span class="gate-field__icon">🔔</span>
-            <input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" data-gate="bell" required>
-          </div>
-          <div class="gate-field">
-            <span class="gate-field__icon">📜</span>
-            <input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]" data-gate="riddle" required>
-          </div>
-          <button class="btn btn--brass btn--gate" type="submit">Open de poort</button>
-        </form>
-        <p class="stage-feedback" id="feedback-gate"></p>
-      </article>
-
-    </main>
+    <div class="game-main">
+      <div id="layer-content"></div>
+      <aside class="clues-sidebar">
+        <h3>Verzamelde Aanwijzingen</h3>
+        <div id="clues-list"></div>
+      </aside>
+    </div>
   </section>
 
-  <!-- ===================== WIN SCREEN ===================== -->
-  <section id="screen-win" class="screen">
-    <div class="end-content">
-      <p class="eyebrow">Ontsnapt</p>
-      <h1 class="title-display">DE POORT ZWAAIT OPEN</h1>
-      <p class="story-text">
-        Koud nachtlucht stroomt naar binnen. Achter je sluit de kloktoren zich weer, tevreden
-        gesteld — voor nu. Je ontsnapte in
-      </p>
-      <p class="end-time" id="win-time">00:00</p>
-      <form id="form-score" class="score-form">
-        <label for="player-name" class="visually-hidden">Jouw naam</label>
-        <input id="player-name" type="text" maxlength="18" placeholder="Jouw naam voor het register…" required>
-        <button class="btn btn--brass" type="submit">Bewaar in het register</button>
+  <!-- WIN -->
+  <section id="screen-win" class="screen vault-light">
+    <div class="end-frame">
+      <div class="vault-door"><div class="panel left"></div><div class="panel right"></div></div>
+      <h1>Ontsnapt</h1>
+      <p>De kluisdeur glijdt open. Boven je hoofd dooft het rode alarmlicht.
+      Het systeem zwijgt — voorlopig.</p>
+      <div class="final-time" id="final-time">00:00</div>
+      <form class="score-form" id="score-form">
+        <label for="score-name" class="visually-hidden">Naam voor het archief</label>
+        <input type="text" id="score-name" name="playerName" placeholder="Naam voor het archief" maxlength="18" required>
+        <button class="btn btn-primary" type="submit">Bewaar tijd</button>
       </form>
-      <div class="leaderboard-preview">
-        <h2 class="label-eyebrow">Register van ontsnapten</h2>
-        <ol id="leaderboard-win" class="leaderboard-list"></ol>
-      </div>
-      <button id="btn-restart-win" class="btn btn--ghost" type="button">Nog eens wagen</button>
-    </div>
-  </section>
-
-  <!-- ===================== LOSE SCREEN ===================== -->
-  <section id="screen-lose" class="screen">
-    <div class="end-content end-content--lose">
-      <p class="eyebrow">Middernacht</p>
-      <h1 class="title-display">DE TOREN VERZEGELT ZICH</h1>
-      <p class="story-text">
-        De grote wijzer bereikt het twaalfde uur. Met een doffe klap valt het mechanisme dicht.
-        Het Gouden Uurwerk blijft — net als jij — verborgen tot de volgende volle maan.
-      </p>
-      <button id="btn-restart-lose" class="btn btn--brass" type="button">Probeer het opnieuw</button>
-      <div class="leaderboard-preview">
-        <h2 class="label-eyebrow">Register van ontsnapten</h2>
-        <ol id="leaderboard-lose" class="leaderboard-list"></ol>
+      <div class="btn-row">
+        <button class="btn" id="btn-win-leaderboard" type="button">Bekijk Archief der Snelsten</button>
+        <button class="btn" id="btn-win-again" type="button">Opnieuw</button>
       </div>
     </div>
   </section>
 
+  <!-- LOSE -->
+  <section id="screen-lose" class="screen stone-corridor">
+    <div class="end-frame">
+      <div class="chains">⛓️</div>
+      <h1>Gezuiverd</h1>
+      <p>"Tijd verstreken," fluistert de stem door de gangen. De archiefkasten sluiten zich om je heen.
+      Je wordt onderdeel van de collectie... voor nu.</p>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-lose-again" type="button">Probeer opnieuw</button>
+        <button class="btn" id="btn-lose-leaderboard" type="button">Archief der Snelsten</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEADERBOARD -->
+  <section id="screen-leaderboard" class="screen stone-corridor">
+    <div class="leaderboard-frame">
+      <h2>Archief der Snelsten</h2>
+      <div id="lb-content"></div>
+      <div class="btn-row">
+        <button class="btn" id="btn-lb-back" type="button">Terug</button>
+      </div>
+    </div>
+  </section>
 </div>
-
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script src="script.js"></script>
 </body>

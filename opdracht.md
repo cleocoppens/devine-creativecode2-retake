@@ -30,58 +30,49 @@ Bouw een webbased escape room-ervaring die uitdagingen, exploratie en storytelli
 
 ---
 
-## Concept: ECHO-9 — Ontsnap uit het Geheugen
+## Concept: De Verboden Kluis
 
-*Nieuw concept, losstaand van het vorige (Meridian — De Laatste Nacht van de Kloktoren).*
+*Geïmplementeerd concept — vervangt het eerdere ECHO-9-ontwerp.*
 
 ### Thema en setting
 
-Jij bent een onderzoeker die via een neurale link is ingelogd op **ECHO-9**, een verouderde AI-kern in een verlaten onderzoeksstation. Tijdens het onderhoud loopt er iets fout: het systeem start een **kernel wipe** — een volledige zelfwissing — en jouw bewustzijn zit nog vast in het geheugen van de AI. Je moet drie geheugensectoren doorkruisen, verspreide datafragmenten reconstrueren tot een geldige escape-key, en die uitvoeren via het terminalcommando `escape.exe` voordat de wipe voltooid is.
+Jij bent leerling-archivaris aan een universiteitsbibliotheek. Terwijl je 's avonds laat een oud manuscript terugbrengt, valt de deur van de **Verboden Sectie** achter je in het slot. Het eeuwenoude bewakingssysteem van het archief start een **zuiveringsprocedure**. Vijf beveiligingslagen scheiden je van de uitgang — ontcijfer ze allemaal voor de tijd om is, of blijf voor altijd onderdeel van de collectie.
 
-- **Win-state**: de correcte escape-key wordt op tijd ingevoerd → succesvolle "uitlog" animatie, tijd wordt opgeslagen in het leaderboard.
-- **Lose-state**: de timer bereikt 0 voordat de key compleet is → glitch/wipe-animatie, "GEHEUGEN GEWIST" scherm, optie om opnieuw te proberen.
+- **Win-state**: de Meestercode wordt op tijd samengesteld en ingevoerd → de kluisdeur glijdt open (geanimeerd), tijd wordt opgeslagen in het leaderboard.
+- **Lose-state**: de timer bereikt 0 → "Gezuiverd"-scherm met zwaaiende kettingen, optie om opnieuw te proberen.
 
-Visuele stijl: donkere terminal-esthetiek (near-black achtergrond, monospace accenten, neon cyaan/magenta highlights), glitch- en scanline-effecten, subtiele CRT-flikkering — dit geeft veel ruimte voor CSS-animaties en micro-interacties die passen bij het digitale thema.
+Visuele stijl: gotische archief/bibliotheek-esthetiek (perkament, koper/goud, kaarslicht en Baskerville-typografie). Elk scherm heeft een eigen sfeerfoto (`images/`), gecombineerd met CSS-gradients voor leesbaarheid: een gotische hal met poort op intro en leaderboard, een fakkelgang tijdens het spel, een mijnschacht bij verlies, en een maanverlichte binnenplaats bij winst. Het manuscript en de introscroll gebruiken een perkamentfoto als textuur.
 
-### Structuur — 3 sectoren (kamers)
+### Structuur — 5 beveiligingslagen (één kluis)
 
-1. **Sector Alpha — Login Terminal**
-   Introductie/storytelling. Speler moet een Caesar-cipher decoderen (aanwijzing verstopt in omgevingstekst/log-bestanden) en het wachtwoord invoeren via een formulier om toegang te krijgen tot de kern.
-
-2. **Sector Beta — Corrupted Files**
-   Twee uitdagingen:
-   - Een memory-match puzzel (fragmenten/iconen aanklikken in juiste volgorde) die een verborgen afbeelding of code onthult.
-   - Een binair-naar-tekst puzzel: speler krijgt een binaire code en typt het gedecodeerde woord in een formulierveld.
-
-3. **Sector Gamma — Firewall Core**
-   Twee uitdagingen:
-   - Een circuit-reroute puzzel: nodes in de juiste volgorde aanklikken om stroom te herstellen (visuele glow-feedback per stap).
-   - Een combinatieslot (numeriek formulier) waarvan het getal verborgen zit via een stenografie-achtige aanwijzing (bv. gemarkeerde letters/cijfers in een logbestand).
-
-   Afsluiter: alle verzamelde fragmenten worden gecombineerd tot de escape-key, in te voeren in de terminal (`escape.exe`) om te winnen.
+1. **Laag I — Het Coderadeslot**: drie letterwielen instellen op een 3-lettercode. De code zit verstopt als acrostichon in de flavourtekst (eerste letter van elke zin).
+2. **Laag II — De Boekclassificatie**: zes verboden boeken in chronologische volgorde (jaartal) aanklikken; de eerste letters van elk boek vormen samen een woord.
+3. **Laag III — Het Waszegelarchief**: vier fragmenten koppelen aan het juiste adellijke huis op basis van het beschreven wapendier; elk huis levert een cijfer.
+4. **Laag IV — De Manuscriptvertaling**: een geheimschrift (symbool-naar-letter legenda) ontcijferen tot een woord, ingevoerd via een formulier.
+5. **Laag V — De Finale Reeks**: de Meestercode combineren uit fragmenten van de vorige vier lagen volgens een expliciete formule, en invoeren om de kluis te openen.
 
 ### Hintsysteem (optioneel, wel toegevoegd)
 
 - Speler start met **3 hints**.
-- Elke hint kost **30 seconden** van de resterende tijd (tijdstraf) in plaats van een harde limiet, zodat spelers zelf de afweging maken.
-- Hint verschijnt met een korte `setTimeout()`-vertraging ("decoding hint...") voor extra spanning/feedback.
+- Elke hint kost **60 seconden** van de resterende tijd (tijdstraf), zonder harde limiet op het aantal pogingen.
+- Hint verschijnt in een paneel onder de huidige laag, met een shake-microinteractie op de hintknop.
 
 ### Leaderboard
 
-- Bij winst: formulier voor het invoeren van een naam/initialen.
-- Beste tijden (top 5-10) worden opgeslagen en getoond via `localStorage`.
-- Optioneel: voortgang (huidige sector/opgeloste puzzels) tussentijds opslaan zodat een pagina-refresh niet meteen alles reset.
+- Bij winst: formulier voor het invoeren van een naam.
+- Beste tijden (top 10) worden opgeslagen en getoond via `localStorage`.
+- Voortgang (verzamelde fragmenten per laag) is zichtbaar in de zijbalk tijdens het spel.
 
 ### Technische invulling per vereiste
 
-| Vereiste | Toepassing in ECHO-9 |
+| Vereiste | Toepassing in De Verboden Kluis |
 |---|---|
-| DOM-manipulatie | Tonen/verbergen van sectoren, clues, feedbackberichten, voortgangsindicator |
-| Eventhandlers | Klik-events op nodes/fragmenten, submit-events op formulieren, keyboard input in terminal |
-| Alleen arrow functions | Alle event handlers en helperfuncties als arrow functions |
-| Formulieren | Wachtwoord-invoer, binaire code-invoer, combinatieslot, naam voor leaderboard |
-| localStorage | Array van beste tijden (leaderboard), optioneel voortgang |
-| `setInterval()` | Countdown timer (kernel wipe aftellen) |
-| `setTimeout()` | Vertraagde feedback bij foute/juiste invoer, hint-onthulling, overgangsanimaties tussen sectoren |
-| CSS-animaties | Glitch/flicker-effecten, scanlines, pulse bij correcte input, shake bij foute input |
-| Micro-interacties | Hover/press states op knoppen en nodes, glow-feedback bij voortgang, timer die van kleur verandert bij tijdsdruk (bv. rood + pulse onder 60 seconden) |
+| DOM-manipulatie | Renderen van elke laag, voortgangsindicator (dots), aanwijzingen-zijbalk, leaderboard |
+| Eventhandlers | Klik-events op wielen/boeken/zegels, submit-events op formulieren |
+| Alleen arrow functions | Volledige `script.js` is één IIFE (`(() => {...})()`) met uitsluitend arrow functions |
+| Formulieren | Manuscriptvertaling, Meestercode-invoer en naam-voor-leaderboard via `FormData` + `Object.fromEntries()` |
+| localStorage | Array van beste tijden (leaderboard) |
+| `setInterval()` | Countdown timer (zuiveringsprocedure aftellen) |
+| `setTimeout()` | Vertraagde overgang naar volgende laag, hersteltijd na foute invoer, hint-shake |
+| CSS-animaties | Fakkelflikkering, pulserende voortgangsstip, shake bij foute input, wiegende kettingen, kluisdeur die open schuift |
+| Micro-interacties | Hover/press states op knoppen en boekkaarten, glow bij voortgang, timer die rood pulseert onder 60 seconden |
