@@ -160,6 +160,7 @@
   .intro-story{ text-align:left; line-height:1.7; color:var(--parchment-dim); font-size:15.5px; margin:22px 0 28px; }
   .intro-story strong{ color:var(--gold-bright); font-weight:normal; font-style:italic; }
   .btn-row{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+  .intro-hint{ color:var(--parchment-dim); font-size:13px; text-align:center; margin-top:14px; opacity:0.75; }
 
   .btn{
     font-family:var(--font-display); letter-spacing:0.08em; text-transform:uppercase; font-size:13px;
@@ -411,6 +412,7 @@
   .lb-list li .lb-name{ flex:1; color:var(--parchment); }
   .lb-list li .lb-time{ color:var(--gold-bright); }
   .lb-empty{ color:var(--parchment-dim); font-style:italic; text-align:center; margin:20px 0; }
+  .lb-empty-hint{ color:var(--parchment-dim); font-size:13px; text-align:center; margin:-12px 0 20px; opacity:0.75; }
 
   /* Volledig-scherm gouden flits die script.js (flashSuccess) bij elke
      opgeloste laag afvuurt, als directe visuele beloning voor een juiste zet. */

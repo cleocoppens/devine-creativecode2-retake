@@ -20,7 +20,7 @@ const state = {
 const showScreen = (id) => {
   const $screens = document.querySelectorAll(".screen");
   $screens.forEach(($screen) => $screen.classList.remove("active"));
-  const $target = document.querySelector("#" + id);
+  const $target = document.querySelector(`#${id}`);
   $target.classList.add("active");
 };
 
@@ -32,17 +32,14 @@ const shuffle = (arr) => {
 };
 
 // Zet een getal om naar 2 cijfers, bv. 5 -> "05".
-const pad = (n) => {
-  if (n < 10) return "0" + n;
-  return "" + n;
-};
+const pad = (n) => (n < 10 ? `0${n}` : `${n}`);
 
 // Zet seconden om naar MM:SS voor de timer en het leaderboard.
 const formatTime = (secs) => {
   const s = secs < 0 ? 0 : secs;
   const m = Math.floor(s / 60);
   const r = Math.floor(s % 60);
-  return pad(m) + ":" + pad(r);
+  return `${pad(m)}:${pad(r)}`;
 };
 
 // Laat de gouden flits even opnieuw afspelen bij een correcte oplossing.
@@ -64,7 +61,7 @@ const playShake = ($el) => {
 // zodra er nog maar 60 seconden of minder over zijn.
 const updateTimerDisplay = () => {
   const $timerDisplay = document.querySelector("#timer-display");
-  $timerDisplay.innerHTML = '<span class="timer-label">Tijd tot zuivering</span>' + formatTime(state.timeLeft);
+  $timerDisplay.innerHTML = `<span class="timer-label">Tijd tot zuivering</span>${formatTime(state.timeLeft)}`;
   $timerDisplay.classList.toggle("warning", state.timeLeft <= 60);
 };
 
@@ -134,7 +131,7 @@ const renderClues = () => {
     $item.className = "clue-item";
     const val = state.fragments[i];
     const valueClass = val ? "clue-value" : "clue-value unknown";
-    $item.innerHTML = '<span class="clue-label">' + label + '</span><span class="' + valueClass + '">' + (val || "??????") + "</span>";
+    $item.innerHTML = `<span class="clue-label">${label}</span><span class="${valueClass}">${val || "??????"}</span>`;
     $list.appendChild($item);
   });
 };
@@ -158,7 +155,7 @@ const handleClickHint = () => {
   playShake($hintBtn);
   const $panel = document.querySelector("#hint-panel");
   if ($panel) {
-    $panel.textContent = "💡 " + HINTS[state.layer];
+    $panel.textContent = `💡 ${HINTS[state.layer]}`;
     $panel.classList.add("show");
   }
   if (state.hintsLeft === 0) $hintBtn.disabled = true;
@@ -170,7 +167,7 @@ const goToLayer = (n) => {
   state.layer = n;
   renderProgress();
   renderClues();
-  const panelHtml = '<div class="hint-panel" id="hint-panel"></div>';
+  const panelHtml = `<div class="hint-panel" id="hint-panel"></div>`;
   if (n === 0) {
     renderLayer1(panelHtml);
   } else if (n === 1) {
@@ -228,12 +225,12 @@ const handleClickWheelButton = ($btn) => {
   wheelState[idx] = wheelState[idx] + dir;
   if (wheelState[idx] < 0) wheelState[idx] = ALPHA.length - 1;
   if (wheelState[idx] >= ALPHA.length) wheelState[idx] = 0;
-  document.querySelector("#dial-current-" + idx).textContent = ALPHA[wheelState[idx]];
+  document.querySelector(`#dial-current-${idx}`).textContent = ALPHA[wheelState[idx]];
 };
 
 // Verwerkt een klik op de "Ontgrendel"-knop van laag 1.
 const handleClickCheckWheels = () => {
-  const guess = ALPHA[wheelState[0]] + ALPHA[wheelState[1]] + ALPHA[wheelState[2]];
+  const guess = `${ALPHA[wheelState[0]]}${ALPHA[wheelState[1]]}${ALPHA[wheelState[2]]}`;
   if (guess === TARGET_1) {
     solveLayer(TARGET_1, "De cijferwielen klikken vast. ARX — de Latijnse burcht. Toegang verleend.");
   } else {
@@ -247,40 +244,38 @@ const renderLayer1 = (panelHtml) => {
   wheelState[1] = 0;
   wheelState[2] = 0;
   const $layerContent = document.querySelector("#layer-content");
-  $layerContent.innerHTML =
-    '<div class="layer-inner">' +
-    '<div class="layer-eyebrow">Laag I van V</div>' +
-    '<h2 class="layer-title">Het Coderadeslot</h2>' +
-    '<div class="layer-flavor">' +
-    '<span class="acro-letter">A</span>an de rand van het weten wacht een zware deur.<br>' +
-    '<span class="acro-letter">R</span>adeloos zoekt de leerling-archivaris naar een teken in het steen.<br>' +
-    '<span class="acro-letter">X</span> markeert nooit toeval — lees de eerste letters van dit vers, van boven naar beneden.' +
-    "</div>" +
-    '<div class="wheels" id="wheels"></div>' +
-    '<div style="text-align:center;">' +
-    '<button class="btn btn-primary" id="btn-check1" type="button">Ontgrendel</button>' +
-    "</div>" +
-    '<div class="feedback-msg" id="layer-feedback"></div>' +
-    panelHtml +
-    "</div>";
+  $layerContent.innerHTML = `
+    <div class="layer-inner">
+      <div class="layer-eyebrow">Laag I van V</div>
+      <h2 class="layer-title">Het Coderadeslot</h2>
+      <div class="layer-flavor">
+        <span class="acro-letter">A</span>an de rand van het weten wacht een zware deur.<br>
+        <span class="acro-letter">R</span>adeloos zoekt de leerling-archivaris naar een teken in het steen.<br>
+        <span class="acro-letter">X</span> markeert nooit toeval — lees de eerste letters van dit vers, van boven naar beneden.
+      </div>
+      <div class="wheels" id="wheels"></div>
+      <div style="text-align:center;">
+        <button class="btn btn-primary" id="btn-check1" type="button">Ontgrendel</button>
+      </div>
+      <div class="feedback-msg" id="layer-feedback"></div>
+      ${panelHtml}
+    </div>
+  `;
 
   const $wheelsWrap = document.querySelector("#wheels");
-  $wheelsWrap.innerHTML = "";
-  [0, 1, 2].forEach((idx) => {
-    const $wheel = document.createElement("div");
-    $wheel.className = "wheel";
-    $wheel.innerHTML =
-      '<div class="dial-box"><span class="dial-current" id="dial-current-' +
-      idx +
-      '">' +
-      ALPHA[wheelState[idx]] +
-      "</span></div>" +
-      '<div class="wheel-btns">' +
-      '<button data-idx="' + idx + '" data-dir="-1" type="button">◀</button>' +
-      '<button data-idx="' + idx + '" data-dir="1" type="button">▶</button>' +
-      "</div>";
-    $wheelsWrap.appendChild($wheel);
-  });
+  $wheelsWrap.innerHTML = [0, 1, 2]
+    .map(
+      (idx) => `
+      <div class="wheel">
+        <div class="dial-box"><span class="dial-current" id="dial-current-${idx}">${ALPHA[wheelState[idx]]}</span></div>
+        <div class="wheel-btns">
+          <button data-idx="${idx}" data-dir="-1" type="button">◀</button>
+          <button data-idx="${idx}" data-dir="1" type="button">▶</button>
+        </div>
+      </div>
+    `
+    )
+    .join("");
 
   // Elke ◀/▶ knop draait zijn eigen wiel één letter verder.
   document.querySelectorAll(".wheel-btns button").forEach(($btn) => {
@@ -310,7 +305,7 @@ const renderShelf = () => {
   for (let i = 0; i < 6; i++) {
     const $slot = document.createElement("div");
     $slot.className = bookSelection[i] !== undefined ? "slot filled" : "slot";
-    $slot.id = "slot-" + i;
+    $slot.id = `slot-${i}`;
     $slot.textContent = bookSelection[i] !== undefined ? i + 1 : "";
     $shelf.appendChild($slot);
     if (i < 5) {
@@ -326,20 +321,24 @@ const renderShelf = () => {
 // en bewaard in een data-attribuut, zodat een re-render niet opnieuw hust.
 const renderBookPile = () => {
   const $pile = document.querySelector("#book-pile");
-  $pile.innerHTML = "";
   const order = $pile.dataset.order ? JSON.parse($pile.dataset.order) : shuffle(BOOKS.map((b) => b.id));
   $pile.dataset.order = JSON.stringify(order);
 
-  order.forEach((id) => {
-    const book = BOOKS.find((b) => b.id === id);
-    const $card = document.createElement("button");
-    $card.type = "button";
-    $card.className = bookSelection.indexOf(id) !== -1 ? "book-card used" : "book-card";
-    $card.style.setProperty("--book-color", book.color);
-    $card.innerHTML =
-      '<span class="book-symbol">' + book.symbol + '</span><span class="book-title">' + book.title + '</span><span class="book-year">' + book.year + "</span>";
+  $pile.innerHTML = order
+    .map((id) => {
+      const book = BOOKS.find((b) => b.id === id);
+      const usedClass = bookSelection.indexOf(id) !== -1 ? "book-card used" : "book-card";
+      return `
+        <button type="button" class="${usedClass}" style="--book-color:${book.color};" data-book-id="${id}">
+          <span class="book-symbol">${book.symbol}</span><span class="book-title">${book.title}</span><span class="book-year">${book.year}</span>
+        </button>
+      `;
+    })
+    .join("");
+
+  document.querySelectorAll("#book-pile .book-card").forEach(($card) => {
+    const id = parseInt($card.dataset.bookId, 10);
     $card.addEventListener("click", () => handleClickBook(id));
-    $pile.appendChild($card);
   });
 };
 
@@ -361,7 +360,7 @@ const handleClickBook = (id) => {
           return b.letter;
         })
         .join("");
-      solveLayer(code, "De boeken schuiven vast in hun sleuven. Samen vormen ze: " + code + ".");
+      solveLayer(code, `De boeken schuiven vast in hun sleuven. Samen vormen ze: ${code}.`);
     } else {
       showBadFeedback("Dit is niet de juiste volgorde van ouderdom. De plank reset zichzelf.");
       document.querySelectorAll(".slot").forEach(($slot) => $slot.classList.add("shake"));
@@ -377,20 +376,21 @@ const handleClickBook = (id) => {
 const renderLayer2 = (panelHtml) => {
   bookSelection = [];
   const $layerContent = document.querySelector("#layer-content");
-  $layerContent.innerHTML =
-    '<div class="layer-inner">' +
-    '<div class="layer-eyebrow">Laag II van V</div>' +
-    '<h2 class="layer-title">De Boekclassificatie</h2>' +
-    '<div class="layer-flavor">' +
-    "Zes verboden boeken staan door elkaar op de plank gegooid. De plank ontgrendelt " +
-    "alleen als ze op ouderdom staan: van het oudste jaartal naar het jongste. Klik de " +
-    "boeken in de juiste volgorde aan." +
-    "</div>" +
-    '<div class="shelf" id="shelf"></div>' +
-    '<div class="book-pile" id="book-pile"></div>' +
-    '<div class="feedback-msg" id="layer-feedback"></div>' +
-    panelHtml +
-    "</div>";
+  $layerContent.innerHTML = `
+    <div class="layer-inner">
+      <div class="layer-eyebrow">Laag II van V</div>
+      <h2 class="layer-title">De Boekclassificatie</h2>
+      <div class="layer-flavor">
+        Zes verboden boeken staan door elkaar op de plank gegooid. De plank ontgrendelt
+        alleen als ze op ouderdom staan: van het oudste jaartal naar het jongste. Klik de
+        boeken in de juiste volgorde aan.
+      </div>
+      <div class="shelf" id="shelf"></div>
+      <div class="book-pile" id="book-pile"></div>
+      <div class="feedback-msg" id="layer-feedback"></div>
+      ${panelHtml}
+    </div>
+  `;
   renderShelf();
   renderBookPile();
 };
@@ -426,18 +426,18 @@ const handleClickFragment = (fragId, $card) => {
 const handleClickHouse = (houseIdx, $houseBtn) => {
   if (selectedFrag === null || $houseBtn.classList.contains("solved")) return;
   const frag = FRAGMENTS.find((f) => f.id === selectedFrag);
-  const $fragCard = document.querySelector("#frag-" + selectedFrag);
+  const $fragCard = document.querySelector(`#frag-${selectedFrag}`);
   if (frag.houseIdx === houseIdx) {
     $fragCard.classList.remove("selected");
     $fragCard.classList.add("solved");
     $houseBtn.classList.add("solved");
-    document.querySelector("#house-shield-" + houseIdx).textContent = HOUSES[houseIdx].symbol;
+    document.querySelector(`#house-shield-${houseIdx}`).textContent = HOUSES[houseIdx].symbol;
     sealAssignments[selectedFrag] = houseIdx;
     selectedFrag = null;
     const solvedCount = Object.keys(sealAssignments).length;
     if (solvedCount === 4) {
       const code = HOUSES.map((h) => h.digit).join("");
-      solveLayer(code, "Alle zegels rusten op hun plek. Het slot fluistert een getal: " + code + ".");
+      solveLayer(code, `Alle zegels rusten op hun plek. Het slot fluistert een getal: ${code}.`);
     }
   } else {
     $fragCard.classList.add("shake");
@@ -455,44 +455,49 @@ const renderLayer3 = (panelHtml) => {
   selectedFrag = null;
   const shuffledFrags = shuffle(FRAGMENTS);
   const $layerContent = document.querySelector("#layer-content");
-  $layerContent.innerHTML =
-    '<div class="layer-inner">' +
-    '<div class="layer-eyebrow">Laag III van V</div>' +
-    '<h2 class="layer-title">Het Waszegelarchief</h2>' +
-    '<div class="layer-flavor">' +
-    "Vier verzegelde fragmenten liggen los van hun herkomst. Kies een zegel, en klik " +
-    "daarna het adellijke huis waarbij het volgens jou hoort." +
-    "</div>" +
-    '<div class="seals-grid">' +
-    '<div class="seal-col" id="frag-list"></div>' +
-    '<div class="house-list" id="house-list"></div>' +
-    "</div>" +
-    '<div class="feedback-msg" id="layer-feedback"></div>' +
-    panelHtml +
-    "</div>";
+  $layerContent.innerHTML = `
+    <div class="layer-inner">
+      <div class="layer-eyebrow">Laag III van V</div>
+      <h2 class="layer-title">Het Waszegelarchief</h2>
+      <div class="layer-flavor">
+        Vier verzegelde fragmenten liggen los van hun herkomst. Kies een zegel, en klik
+        daarna het adellijke huis waarbij het volgens jou hoort.
+      </div>
+      <div class="seals-grid">
+        <div class="seal-col" id="frag-list"></div>
+        <div class="house-list" id="house-list"></div>
+      </div>
+      <div class="feedback-msg" id="layer-feedback"></div>
+      ${panelHtml}
+    </div>
+  `;
 
   const $fragList = document.querySelector("#frag-list");
-  $fragList.innerHTML = "";
+  $fragList.innerHTML = shuffledFrags
+    .map(
+      (f) => `
+      <button type="button" class="frag-card seal-item" id="frag-${f.id}">
+        <div class="seal-circle">${f.symbol}</div><div class="seal-caption">${f.text}</div>
+      </button>
+    `
+    )
+    .join("");
   shuffledFrags.forEach((f) => {
-    const $card = document.createElement("button");
-    $card.type = "button";
-    $card.className = "frag-card seal-item";
-    $card.id = "frag-" + f.id;
-    $card.innerHTML = '<div class="seal-circle">' + f.symbol + '</div><div class="seal-caption">' + f.text + "</div>";
+    const $card = document.querySelector(`#frag-${f.id}`);
     $card.addEventListener("click", () => handleClickFragment(f.id, $card));
-    $fragList.appendChild($card);
   });
 
   const $houseList = document.querySelector("#house-list");
-  $houseList.innerHTML = "";
-  HOUSES.forEach((h, idx) => {
-    const $houseBtn = document.createElement("button");
-    $houseBtn.type = "button";
-    $houseBtn.className = "house-btn";
-    $houseBtn.id = "house-" + idx;
-    $houseBtn.innerHTML = '<span class="house-shield" id="house-shield-' + idx + '"></span><span class="house-info"><span>' + h.name + "</span></span>";
+  $houseList.innerHTML = HOUSES.map(
+    (h, idx) => `
+      <button type="button" class="house-btn" id="house-${idx}">
+        <span class="house-shield" id="house-shield-${idx}"></span><span class="house-info"><span>${h.name}</span></span>
+      </button>
+    `
+  ).join("");
+  HOUSES.forEach((_, idx) => {
+    const $houseBtn = document.querySelector(`#house-${idx}`);
     $houseBtn.addEventListener("click", () => handleClickHouse(idx, $houseBtn));
-    $houseList.appendChild($houseBtn);
   });
 };
 
@@ -517,7 +522,7 @@ const handleSubmitTranslation = (event) => {
   const formValues = Object.fromEntries(formData);
   const val = (formValues.answer || "").trim().toUpperCase();
   if (val === TARGET_4) {
-    solveLayer(TARGET_4, 'Het manuscript ontvouwt zich vanzelf. "' + TARGET_4 + '" — waarheid.');
+    solveLayer(TARGET_4, `Het manuscript ontvouwt zich vanzelf. "${TARGET_4}" — waarheid.`);
   } else {
     showBadFeedback("Dat woord opent niets. Controleer de legenda nogmaals.");
     playShake(document.querySelector("#input4"));
@@ -532,35 +537,30 @@ const renderLayer4 = (panelHtml) => {
     .join(" ");
 
   const $layerContent = document.querySelector("#layer-content");
-  $layerContent.innerHTML =
-    '<div class="layer-inner">' +
-    '<div class="layer-eyebrow">Laag IV van V</div>' +
-    '<h2 class="layer-title">De Manuscriptvertaling</h2>' +
-    '<div class="layer-flavor">' +
-    "Een laatste manuscript ligt open op de lezenaar, geschreven in het geheimschrift van " +
-    "de aartsarchivarissen. Gebruik de legenda om het verborgen woord te ontcijferen." +
-    "</div>" +
-    '<div class="manuscript-sheet parchment-texture">' +
-    '<div class="legend-grid" id="legend"></div>' +
-    '<div class="encoded-word">' + encoded + "</div>" +
-    "</div>" +
-    '<form class="answer-form" id="form4">' +
-    '<label for="input4" class="visually-hidden">Jouw vertaling</label>' +
-    '<input type="text" id="input4" name="answer" placeholder="Typ hier je vertaling..." autocomplete="off" required>' +
-    '<button class="btn btn-primary" type="submit">Controleer</button>' +
-    "</form>" +
-    '<div class="feedback-msg" id="layer-feedback"></div>' +
-    panelHtml +
-    "</div>";
+  $layerContent.innerHTML = `
+    <div class="layer-inner">
+      <div class="layer-eyebrow">Laag IV van V</div>
+      <h2 class="layer-title">De Manuscriptvertaling</h2>
+      <div class="layer-flavor">
+        Een laatste manuscript ligt open op de lezenaar, geschreven in het geheimschrift van
+        de aartsarchivarissen. Gebruik de legenda om het verborgen woord te ontcijferen.
+      </div>
+      <div class="manuscript-sheet parchment-texture">
+        <div class="legend-grid" id="legend"></div>
+        <div class="encoded-word">${encoded}</div>
+      </div>
+      <form class="answer-form" id="form4">
+        <label for="input4" class="visually-hidden">Jouw vertaling</label>
+        <input type="text" id="input4" name="answer" placeholder="Typ hier je vertaling..." autocomplete="off" required>
+        <button class="btn btn-primary" type="submit">Controleer</button>
+      </form>
+      <div class="feedback-msg" id="layer-feedback"></div>
+      ${panelHtml}
+    </div>
+  `;
 
   const $legend = document.querySelector("#legend");
-  $legend.innerHTML = "";
-  legend.forEach((c) => {
-    const $item = document.createElement("div");
-    $item.className = "legend-cell";
-    $item.innerHTML = '<span class="sym">' + c.sym + "</span>= " + c.letter;
-    $legend.appendChild($item);
-  });
+  $legend.innerHTML = legend.map((c) => `<div class="legend-cell"><span class="sym">${c.sym}</span>= ${c.letter}</div>`).join("");
 
   const $form4 = document.querySelector("#form4");
   $form4.addEventListener("submit", handleSubmitTranslation);
@@ -568,18 +568,19 @@ const renderLayer4 = (panelHtml) => {
 
 // ================= LAAG 5: De Finale Reeks =================
 // Decoratieve achtergrond achter de fragment-overzichtsvakjes van laag 5.
-const MANDALA_SVG =
-  '<svg viewBox="0 0 300 300" class="mandala-bg">' +
-  '<circle cx="150" cy="150" r="140" fill="none" stroke="var(--gold)" stroke-width="1"/>' +
-  '<circle cx="150" cy="150" r="110" fill="none" stroke="var(--gold)" stroke-width="1"/>' +
-  '<circle cx="150" cy="150" r="80" fill="none" stroke="var(--gold)" stroke-width="1"/>' +
-  '<line x1="150" y1="10" x2="150" y2="290" stroke="var(--gold)" stroke-width="1"/>' +
-  '<line x1="10" y1="150" x2="290" y2="150" stroke="var(--gold)" stroke-width="1"/>' +
-  '<line x1="52" y1="52" x2="248" y2="248" stroke="var(--gold)" stroke-width="1"/>' +
-  '<line x1="248" y1="52" x2="52" y2="248" stroke="var(--gold)" stroke-width="1"/>' +
-  '<circle cx="150" cy="150" r="34" fill="none" stroke="var(--gold)" stroke-width="1.5"/>' +
-  '<path d="M150 130 v28 M138 158 h24" stroke="var(--gold)" stroke-width="3" stroke-linecap="round"/>' +
-  "</svg>";
+const MANDALA_SVG = `
+  <svg viewBox="0 0 300 300" class="mandala-bg">
+    <circle cx="150" cy="150" r="140" fill="none" stroke="var(--gold)" stroke-width="1"/>
+    <circle cx="150" cy="150" r="110" fill="none" stroke="var(--gold)" stroke-width="1"/>
+    <circle cx="150" cy="150" r="80" fill="none" stroke="var(--gold)" stroke-width="1"/>
+    <line x1="150" y1="10" x2="150" y2="290" stroke="var(--gold)" stroke-width="1"/>
+    <line x1="10" y1="150" x2="290" y2="150" stroke="var(--gold)" stroke-width="1"/>
+    <line x1="52" y1="52" x2="248" y2="248" stroke="var(--gold)" stroke-width="1"/>
+    <line x1="248" y1="52" x2="52" y2="248" stroke="var(--gold)" stroke-width="1"/>
+    <circle cx="150" cy="150" r="34" fill="none" stroke="var(--gold)" stroke-width="1.5"/>
+    <path d="M150 130 v28 M138 158 h24" stroke="var(--gold)" stroke-width="3" stroke-linecap="round"/>
+  </svg>
+`;
 
 // Tekent de vier rijen met vakjes die tonen welke fragment-codes al gevonden zijn.
 const renderFragmentRows = () => {
@@ -593,8 +594,8 @@ const renderFragmentRows = () => {
     .map((l, i) => {
       const val = state.fragments[i];
       const chars = val ? val.split("") : Array(l.len).fill("?");
-      const boxes = chars.map((c) => '<span class="fbox' + (val ? " filled" : "") + '">' + c + "</span>").join("");
-      return '<div class="fragment-row"><div class="frow-label">' + l.label + '</div><div class="frow-boxes">' + boxes + "</div></div>";
+      const boxes = chars.map((c) => `<span class="fbox${val ? " filled" : ""}">${c}</span>`).join("");
+      return `<div class="fragment-row"><div class="frow-label">${l.label}</div><div class="frow-boxes">${boxes}</div></div>`;
     })
     .join("");
 };
@@ -627,28 +628,29 @@ const renderLayer5 = (panelHtml) => {
   const finalCode = f0.slice(-1) + f1 + f2.slice(-1) + f3.slice(0, 3);
 
   const $layerContent = document.querySelector("#layer-content");
-  $layerContent.innerHTML =
-    '<div class="layer-inner">' +
-    '<div class="layer-eyebrow">Laag V van V — Laatste Slot</div>' +
-    '<h2 class="layer-title">De Finale Reeks</h2>' +
-    '<div class="layer-flavor">' +
-    'Een laatste inscriptie gloeit op: <em>"Voer de Meestercode in, samengesteld uit alles wat je vond."</em>' +
-    "</div>" +
-    '<div class="mandala-wrap">' +
-    MANDALA_SVG +
-    '<div class="fragment-rows">' + renderFragmentRows() + "</div>" +
-    "</div>" +
-    '<div class="formula-box">' +
-    "Meestercode = <b>laatste letter</b> van Laag I&nbsp;+&nbsp;<b>volledige code</b> van Laag II&nbsp;+&nbsp;<b>laatste cijfer</b> van Laag III&nbsp;+&nbsp;<b>eerste 3 letters</b> van Laag IV" +
-    "</div>" +
-    '<form class="answer-form" id="form5">' +
-    '<label for="input5" class="visually-hidden">Meestercode</label>' +
-    '<input type="text" id="input5" name="answer" placeholder="Voer de Meestercode in..." autocomplete="off" required>' +
-    '<button class="btn btn-primary" type="submit">Open de Kluis</button>' +
-    "</form>" +
-    '<div class="feedback-msg" id="layer-feedback"></div>' +
-    panelHtml +
-    "</div>";
+  $layerContent.innerHTML = `
+    <div class="layer-inner">
+      <div class="layer-eyebrow">Laag V van V — Laatste Slot</div>
+      <h2 class="layer-title">De Finale Reeks</h2>
+      <div class="layer-flavor">
+        Een laatste inscriptie gloeit op: <em>"Voer de Meestercode in, samengesteld uit alles wat je vond."</em>
+      </div>
+      <div class="mandala-wrap">
+        ${MANDALA_SVG}
+        <div class="fragment-rows">${renderFragmentRows()}</div>
+      </div>
+      <div class="formula-box">
+        Meestercode = <b>laatste letter</b> van Laag I&nbsp;+&nbsp;<b>volledige code</b> van Laag II&nbsp;+&nbsp;<b>laatste cijfer</b> van Laag III&nbsp;+&nbsp;<b>eerste 3 letters</b> van Laag IV
+      </div>
+      <form class="answer-form" id="form5">
+        <label for="input5" class="visually-hidden">Meestercode</label>
+        <input type="text" id="input5" name="answer" placeholder="Voer de Meestercode in..." autocomplete="off" required>
+        <button class="btn btn-primary" type="submit">Open de Kluis</button>
+      </form>
+      <div class="feedback-msg" id="layer-feedback"></div>
+      ${panelHtml}
+    </div>
+  `;
 
   const $form5 = document.querySelector("#form5");
   $form5.addEventListener("submit", (event) => handleSubmitMasterCode(event, finalCode));
@@ -694,13 +696,16 @@ const renderLeaderboard = () => {
   const scores = getLeaderboard();
   const $content = document.querySelector("#lb-content");
   if (scores.length === 0) {
-    $content.innerHTML = '<div class="lb-empty">Nog niemand is ontsnapt aan de Verboden Kluis...</div>';
+    $content.innerHTML = `
+      <div class="lb-empty">Nog niemand is ontsnapt aan de Verboden Kluis...</div>
+      <div class="lb-empty-hint">Speel eerst het spel uit om hier te verschijnen.</div>
+    `;
     return;
   }
   const items = scores
-    .map((s, i) => '<li><span class="lb-rank">' + (i + 1) + '.</span><span class="lb-name">' + s.name + '</span><span class="lb-time">' + formatTime(s.time) + "</span></li>")
+    .map((s, i) => `<li><span class="lb-rank">${i + 1}.</span><span class="lb-name">${s.name}</span><span class="lb-time">${formatTime(s.time)}</span></li>`)
     .join("");
-  $content.innerHTML = '<ul class="lb-list">' + items + "</ul>";
+  $content.innerHTML = `<ul class="lb-list">${items}</ul>`;
 };
 
 // Verwerkt een klik op een van de "bekijk archief"-knoppen.
@@ -717,7 +722,7 @@ const handleSubmitScore = (event) => {
   const formValues = Object.fromEntries(formData);
   const name = (formValues.playerName || "").trim() || "Anoniem";
   saveScore(name);
-  $form.innerHTML = '<span style="color:#7FBF7F;">Tijd bewaard in het archief.</span>';
+  $form.innerHTML = `<span style="color:#7FBF7F;">Tijd bewaard in het archief.</span>`;
 };
 
 // ---------- reset / start ----------
