@@ -96,12 +96,11 @@ const renderProgress = () => {
   $dots.innerHTML = "";
   LAYER_NAMES.forEach((_, i) => {
     const $dot = document.createElement("div");
+    $dot.classList.add("dot");
     if (i < state.layer) {
-      $dot.className = "dot done";
+      $dot.classList.add("done");
     } else if (i === state.layer) {
-      $dot.className = "dot current";
-    } else {
-      $dot.className = "dot";
+      $dot.classList.add("current");
     }
     $dots.appendChild($dot);
   });
@@ -113,7 +112,7 @@ const renderClues = () => {
   const labels = ["Laag I", "Laag II", "Laag III"];
   labels.forEach((label, i) => {
     const $item = document.createElement("div");
-    $item.className = "clue-item";
+    $item.classList.add("clue-item");
     const val = state.fragments[i];
     const valueClass = val ? "clue-value" : "clue-value unknown";
     $item.innerHTML = `<span class="clue-label">${label}</span><span class="${valueClass}">${val || "??????"}</span>`;
@@ -224,7 +223,7 @@ const renderLayer1 = (panelHtml) => {
         <span class="acro-letter">X</span> markeert nooit toeval. Lees de eerste letters van dit vers, van boven naar beneden.
       </div>
       <div class="wheels" id="wheels"></div>
-      <div style="text-align:center;">
+      <div class="layer-action">
         <button class="btn btn-primary" id="btn-check1" type="button">Ontgrendel</button>
       </div>
       <div class="feedback-msg" id="layer-feedback"></div>
@@ -536,7 +535,7 @@ const handleSubmitScore = (event) => {
   const formValues = Object.fromEntries(formData);
   const name = (formValues.playerName || "").trim() || "Anoniem";
   saveScore(name);
-  $form.innerHTML = `<span style="color:#7FBF7F;">Tijd bewaard in het archief.</span>`;
+  $form.innerHTML = `<span class="score-confirm">Tijd bewaard in het archief.</span>`;
 };
 
 const resetState = () => {
