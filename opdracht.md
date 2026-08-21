@@ -68,7 +68,7 @@ Visuele stijl: gotische archief/bibliotheek-esthetiek (perkament, koper/goud, ka
 |---|---|
 | DOM-manipulatie | Renderen van elke laag, voortgangsindicator (dots), aanwijzingen-zijbalk, leaderboard |
 | Eventhandlers | Klik-events op wielen/zegels, submit-events op formulieren |
-| Alleen arrow functions | Volledige `script.js` is één IIFE (`(() => {...})()`) met uitsluitend arrow functions |
+| Alleen arrow functions | Volledige `script.js` bevat uitsluitend arrow functions, geen enkele `function`-declaratie |
 | Formulieren | Manuscriptvertaling, Meestercode-invoer en naam-voor-leaderboard via `FormData` + `Object.fromEntries()` |
 | localStorage | Array van beste tijden (leaderboard) |
 | `setInterval()` | Countdown timer (zuiveringsprocedure aftellen) |

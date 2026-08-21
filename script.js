@@ -89,7 +89,7 @@ const applyPenalty = (secs) => {
   }, 700);
 };
 
-const LAYER_NAMES = ["Coderadepuzzel", "Waszegelarchief", "Manuscriptvertaling", "De Finale Reeks"];
+const LAYER_NAMES = ["Coderadeslot", "Waszegelarchief", "Manuscriptvertaling", "De Finale Reeks"];
 
 const renderProgress = () => {
   const $dots = document.querySelector("#progress-dots");
@@ -416,23 +416,9 @@ const renderLayer3 = (panelHtml) => {
   $form3.addEventListener("submit", handleSubmitTranslation);
 };
 
-const MANDALA_SVG = `
-  <svg viewBox="0 0 300 300" class="mandala-bg">
-    <circle cx="150" cy="150" r="140" fill="none" stroke="var(--gold)" stroke-width="1"/>
-    <circle cx="150" cy="150" r="110" fill="none" stroke="var(--gold)" stroke-width="1"/>
-    <circle cx="150" cy="150" r="80" fill="none" stroke="var(--gold)" stroke-width="1"/>
-    <line x1="150" y1="10" x2="150" y2="290" stroke="var(--gold)" stroke-width="1"/>
-    <line x1="10" y1="150" x2="290" y2="150" stroke="var(--gold)" stroke-width="1"/>
-    <line x1="52" y1="52" x2="248" y2="248" stroke="var(--gold)" stroke-width="1"/>
-    <line x1="248" y1="52" x2="52" y2="248" stroke="var(--gold)" stroke-width="1"/>
-    <circle cx="150" cy="150" r="34" fill="none" stroke="var(--gold)" stroke-width="1.5"/>
-    <path d="M150 130 v28 M138 158 h24" stroke="var(--gold)" stroke-width="3" stroke-linecap="round"/>
-  </svg>
-`;
-
 const renderFragmentRows = () => {
   const labels = [
-    { label: "Laag I: Coderadepuzzel", len: 3 },
+    { label: "Laag I: Coderadeslot", len: 3 },
     { label: "Laag II: Waszegelarchief", len: 4 },
     { label: "Laag III: Manuscriptvertaling", len: 7 },
   ];
@@ -475,10 +461,7 @@ const renderLayer4 = (panelHtml) => {
       <div class="layer-flavor">
         Een laatste inscriptie gloeit op: <em>"Voer de Meestercode in, samengesteld uit alles wat je vond."</em>
       </div>
-      <div class="mandala-wrap">
-        ${MANDALA_SVG}
-        <div class="fragment-rows">${renderFragmentRows()}</div>
-      </div>
+      <div class="fragment-rows">${renderFragmentRows()}</div>
       <div class="formula-box">
         Meestercode = <b>laatste letter</b> van Laag I&nbsp;+&nbsp;<b>volledige code</b> van Laag II&nbsp;+&nbsp;<b>eerste 3 letters</b> van Laag III
       </div>

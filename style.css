@@ -280,6 +280,7 @@
     border:1px solid var(--gold); padding:12px; cursor:pointer; font-size:13px; line-height:1.5; background:rgba(0,0,0,0.25);
     transition:all 0.2s ease;
   }
+  .frag-card:hover:not(.solved):not(.selected){ border-color:var(--gold-bright); background:rgba(201,168,76,0.12); box-shadow:0 0 12px rgba(201,168,76,0.3); }
   .frag-card.selected{ border-color:var(--red-bright); box-shadow:0 0 14px rgba(178,58,58,0.5); }
   .frag-card.selected .seal-circle{ box-shadow:0 0 16px rgba(178,58,58,0.8), inset 0 0 0 3px rgba(0,0,0,0.25); transform:scale(1.06); }
   .frag-card.selected .seal-caption{ border-color:var(--red-bright); }
@@ -321,13 +322,8 @@
   .legend-cell .sym{ color:#7a1010; font-size:17px; margin-right:6px; }
   .encoded-word{ text-align:center; font-size:34px; letter-spacing:14px; color:#3a1f10; margin:0; text-shadow:0 1px 0 rgba(255,255,255,0.3); }
 
-  /* ---------- Layer 4: mandala ---------- */
-  .mandala-wrap{ position:relative; margin:14px 0; }
-  .mandala-bg{
-    position:absolute; top:50%; left:50%; width:340px; height:340px; transform:translate(-50%,-50%);
-    z-index:0; opacity:0.16; pointer-events:none;
-  }
-  .fragment-rows{ position:relative; z-index:1; display:flex; flex-direction:column; gap:12px; margin:20px 0; }
+  /* ---------- Layer 4 ---------- */
+  .fragment-rows{ display:flex; flex-direction:column; gap:12px; margin:20px 0; }
   .fragment-row .frow-label{ font-size:11px; letter-spacing:0.1em; color:var(--gold); text-transform:uppercase; margin-bottom:6px; }
   .frow-boxes{ display:flex; gap:6px; flex-wrap:wrap; }
   .fbox{

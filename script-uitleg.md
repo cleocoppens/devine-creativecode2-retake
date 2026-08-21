@@ -2,6 +2,24 @@
 
 Dit document bevat de volledige JavaScript-code van het spel, opgedeeld per onderdeel, telkens met uitleg erbij. De code in `script.js` zelf bevat geen commentaar meer — deze uitleg staat hier apart.
 
+## JavaScript, CSS of HTML: wie doet wat?
+
+Niet alles hoort in JavaScript. Uit de cursus (`06-micro-interactions`) volgt een duidelijke taakverdeling:
+
+- **CSS kan geen functionaliteit toevoegen of de DOM veranderen**, en kan niet naar events luisteren voor complexere dynamische interacties. Pure state-wissels die semantisch bij een HTML-element passen (`:hover`, `:active`, `:checked`, `<details>/<summary>`, popover) mogen dus best puur CSS/HTML blijven — maar in dit spel is bijna alles een custom interactie (wielen draaien, zegels koppelen, formulieren controleren), dus dat soort ingebouwde elementen komt hier weinig voor.
+- Het patroon dat wél overal terugkomt: **er gebeurt iets (een klik, een `setInterval`-tik) → JavaScript wisselt enkel een class met `classList` → CSS bepaalt hoe die wissel er animatie-technisch uitziet** (via `@keyframes` of `transition` in `style.css`).
+
+Concreet in deze code:
+
+| Taak | Waar |
+|---|---|
+| Spellogica, DOM opbouwen, timer, formulieren, localStorage | **JavaScript** (dit bestand) — kan niet anders |
+| Wanneer iets moet schudden/flitsen/opengaan (het "aan/uit"-moment) | JS zet enkel een **class** (zie `playShake`, `flashSuccess`, `winGame`) |
+| Hóe dat schudden/flitsen/opengaan er precies uitziet (duur, easing, kleur) | **CSS**, via `@keyframes shake`, `@keyframes flash-out`, de `.vault-door` transitie, enz. |
+| Knop-hover/active-stijl | Volledig **CSS** (`:hover`, `:active`) — geen JS-event voor nodig |
+
+`playShake` en `flashSuccess` (verderop in dit document) zijn het duidelijkste voorbeeld: de functie zelf doet niets anders dan een class weghalen en terugzetten; de hele animatie zit in `style.css`.
+
 ## Instellingen
 
 Deze constanten bepalen de spelregels. Ze staan bovenaan zodat je de moeilijkheidsgraad (tijd, strafpunten, ...) op één plek kan aanpassen.
@@ -193,7 +211,7 @@ Trekt de tijdstraf van een hint af van de klok. De tijd mag nooit onder 1 second
 ### LAYER_NAMES
 
 ```js
-const LAYER_NAMES = ["Coderadepuzzel", "Waszegelarchief", "Manuscriptvertaling", "De Finale Reeks"];
+const LAYER_NAMES = ["Coderadeslot", "Waszegelarchief", "Manuscriptvertaling", "De Finale Reeks"];
 ```
 
 Namen van de vier lagen, gebruikt als label boven elk puzzelscherm.
@@ -339,7 +357,7 @@ const showBadFeedback = (msg) => {
 
 Toont foutfeedback onder de huidige laag. Wordt door elke laag opgeroepen bij een fout antwoord; wisselt simpelweg de klasse `ok` om naar `bad` zodat de CSS de tekst rood/anders kan kleuren.
 
-## Laag 1: Coderadepuzzel
+## Laag 1: Coderadeslot
 
 Drie letterwielen die de speler naar de code "ARX" moet zetten. De code staat verstopt als acrostichon: de eerste letter van elke zin in de flavourtekst (Aan.../Radeloos.../X markeert...) spelt A-R-X.
 
@@ -652,30 +670,12 @@ Bouwt de HTML voor laag 3 op. De legenda (welk symbool bij welke letter hoort) w
 
 ## Laag 4: De Finale Reeks
 
-```js
-const MANDALA_SVG = `
-  <svg viewBox="0 0 300 300" class="mandala-bg">
-    <circle cx="150" cy="150" r="140" fill="none" stroke="var(--gold)" stroke-width="1"/>
-    <circle cx="150" cy="150" r="110" fill="none" stroke="var(--gold)" stroke-width="1"/>
-    <circle cx="150" cy="150" r="80" fill="none" stroke="var(--gold)" stroke-width="1"/>
-    <line x1="150" y1="10" x2="150" y2="290" stroke="var(--gold)" stroke-width="1"/>
-    <line x1="10" y1="150" x2="290" y2="150" stroke="var(--gold)" stroke-width="1"/>
-    <line x1="52" y1="52" x2="248" y2="248" stroke="var(--gold)" stroke-width="1"/>
-    <line x1="248" y1="52" x2="52" y2="248" stroke="var(--gold)" stroke-width="1"/>
-    <circle cx="150" cy="150" r="34" fill="none" stroke="var(--gold)" stroke-width="1.5"/>
-    <path d="M150 130 v28 M138 158 h24" stroke="var(--gold)" stroke-width="3" stroke-linecap="round"/>
-  </svg>
-`;
-```
-
-Decoratieve achtergrond achter de fragment-overzichtsvakjes van laag 4. Dit is pure SVG (vector-tekening): cirkels, lijnen en een klein "sleutelgat"-icoontje, enkel voor de sfeer, geen interactieve functie.
-
 ### renderFragmentRows
 
 ```js
 const renderFragmentRows = () => {
   const labels = [
-    { label: "Laag I: Coderadepuzzel", len: 3 },
+    { label: "Laag I: Coderadeslot", len: 3 },
     { label: "Laag II: Waszegelarchief", len: 4 },
     { label: "Laag III: Manuscriptvertaling", len: 7 },
   ];
@@ -730,10 +730,7 @@ const renderLayer4 = (panelHtml) => {
       <div class="layer-flavor">
         Een laatste inscriptie gloeit op: <em>"Voer de Meestercode in, samengesteld uit alles wat je vond."</em>
       </div>
-      <div class="mandala-wrap">
-        ${MANDALA_SVG}
-        <div class="fragment-rows">${renderFragmentRows()}</div>
-      </div>
+      <div class="fragment-rows">${renderFragmentRows()}</div>
       <div class="formula-box">
         Meestercode = <b>laatste letter</b> van Laag I&nbsp;+&nbsp;<b>volledige code</b> van Laag II&nbsp;+&nbsp;<b>eerste 3 letters</b> van Laag III
       </div>
