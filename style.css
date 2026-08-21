@@ -262,29 +262,7 @@
   .wheel-btns button:hover{ background:rgba(201,168,76,0.2); }
   .wheel-btns button:active{ transform:translateY(1px); }
 
-  /* ---------- Layer 2: books ---------- */
-  .shelf{ display:flex; align-items:center; gap:4px; justify-content:center; margin:22px 0 26px; flex-wrap:wrap; }
-  .slot{
-    width:46px; height:88px; border:1px dashed rgba(201,168,76,0.5); display:flex; align-items:center; justify-content:center;
-    font-family:var(--font-mono); font-size:20px; color:var(--gold-bright); background:rgba(0,0,0,0.2);
-  }
-  .slot.filled{ border-style:solid; background:rgba(201,168,76,0.12); }
-  .slot.shake{ animation:shake 0.5s; border-color:var(--red-bright); }
-  .slot-arrow{ color:var(--gold); opacity:0.6; font-size:14px; }
-  .book-pile{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
-  .book-card{
-    width:92px; padding:12px 8px 10px; border:1px solid rgba(201,168,76,0.6); border-top:4px solid var(--book-color, var(--gold));
-    background:linear-gradient(180deg, var(--book-color, #3a2e22) 0%, rgba(26,20,15,0.95) 55%);
-    cursor:pointer; text-align:center; font-size:11.5px; color:var(--parchment); transition:transform 0.2s ease;
-    box-shadow:0 6px 14px rgba(0,0,0,0.4);
-  }
-  .book-card:hover{ transform:translateY(-6px) rotate(-1deg); box-shadow:0 10px 18px var(--shadow); }
-  .book-card.used{ opacity:0.12; pointer-events:none; transform:none; }
-  .book-card .book-symbol{ font-size:20px; display:block; margin-bottom:6px; }
-  .book-card .book-title{ display:block; letter-spacing:0.02em; line-height:1.25; min-height:34px; }
-  .book-card .book-year{ font-family:var(--font-mono); color:var(--gold-bright); font-size:14px; margin-top:8px; display:block; border-top:1px solid rgba(201,168,76,0.3); padding-top:6px; }
-
-  /* ---------- Layer 3: wax seals ---------- */
+  /* ---------- Layer 2: wax seals ---------- */
   .seals-grid{ display:grid; grid-template-columns:1fr 1fr; gap:24px; margin:22px 0; }
   .seal-col{ display:flex; flex-direction:column; gap:14px; }
   .seal-item{ display:flex; align-items:center; gap:12px; cursor:pointer; }
@@ -302,7 +280,6 @@
     border:1px solid var(--gold); padding:12px; cursor:pointer; font-size:13px; line-height:1.5; background:rgba(0,0,0,0.25);
     transition:all 0.2s ease;
   }
-  .frag-card .frag-symbol{ font-size:22px; display:block; margin-bottom:6px; }
   .frag-card.selected{ border-color:var(--red-bright); box-shadow:0 0 14px rgba(178,58,58,0.5); }
   .frag-card.selected .seal-circle{ box-shadow:0 0 16px rgba(178,58,58,0.8), inset 0 0 0 3px rgba(0,0,0,0.25); transform:scale(1.06); }
   .frag-card.selected .seal-caption{ border-color:var(--red-bright); }
@@ -325,9 +302,8 @@
   .house-btn.solved .house-shield{ border-color:#7FBF7F; background:rgba(127,191,127,0.15); }
   .house-btn.shake{ animation:shake 0.5s; }
   .house-info{ display:flex; flex-direction:column; }
-  .house-info .house-desc{ font-size:11px; color:var(--parchment-dim); font-style:italic; }
 
-  /* ---------- Layer 4: translation ---------- */
+  /* ---------- Layer 3: translation ---------- */
   /* clip-path met onregelmatige punten geeft het perkament een gescheurde,
      handgemaakte rand in plaats van een rechte rechthoek. */
   .manuscript-sheet{
@@ -345,7 +321,7 @@
   .legend-cell .sym{ color:#7a1010; font-size:17px; margin-right:6px; }
   .encoded-word{ text-align:center; font-size:34px; letter-spacing:14px; color:#3a1f10; margin:0; text-shadow:0 1px 0 rgba(255,255,255,0.3); }
 
-  /* ---------- Layer 5: mandala ---------- */
+  /* ---------- Layer 4: mandala ---------- */
   .mandala-wrap{ position:relative; margin:14px 0; }
   .mandala-bg{
     position:absolute; top:50%; left:50%; width:340px; height:340px; transform:translate(-50%,-50%);

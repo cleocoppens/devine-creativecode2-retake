@@ -36,20 +36,19 @@ Bouw een webbased escape room-ervaring die uitdagingen, exploratie en storytelli
 
 ### Thema en setting
 
-Jij bent leerling-archivaris aan een universiteitsbibliotheek. Terwijl je 's avonds laat een oud manuscript terugbrengt, valt de deur van de **Verboden Sectie** achter je in het slot. Het eeuwenoude bewakingssysteem van het archief start een **zuiveringsprocedure**. Vijf beveiligingslagen scheiden je van de uitgang — ontcijfer ze allemaal voor de tijd om is, of blijf voor altijd onderdeel van de collectie.
+Jij bent leerling-archivaris aan een universiteitsbibliotheek. Terwijl je 's avonds laat een oud manuscript terugbrengt, valt de deur van de **Verboden Sectie** achter je in het slot. Het eeuwenoude bewakingssysteem van het archief start een **zuiveringsprocedure**. Vier beveiligingslagen scheiden je van de uitgang — ontcijfer ze allemaal voor de tijd om is, of blijf voor altijd onderdeel van de collectie.
 
 - **Win-state**: de Meestercode wordt op tijd samengesteld en ingevoerd → de kluisdeur glijdt open (geanimeerd), tijd wordt opgeslagen in het leaderboard.
 - **Lose-state**: de timer bereikt 0 → "Gezuiverd"-scherm met zwaaiende kettingen, optie om opnieuw te proberen.
 
 Visuele stijl: gotische archief/bibliotheek-esthetiek (perkament, koper/goud, kaarslicht en Baskerville-typografie). Elk scherm heeft een eigen sfeerfoto (`images/`), gecombineerd met CSS-gradients voor leesbaarheid: een gotische hal met poort op intro en leaderboard, een fakkelgang tijdens het spel, een mijnschacht bij verlies, en een maanverlichte binnenplaats bij winst. Het manuscript en de introscroll gebruiken een perkamentfoto als textuur.
 
-### Structuur — 5 beveiligingslagen (één kluis)
+### Structuur — 4 beveiligingslagen (één kluis)
 
 1. **Laag I — Het Coderadeslot**: drie letterwielen instellen op een 3-lettercode. De code zit verstopt als acrostichon in de flavourtekst (eerste letter van elke zin).
-2. **Laag II — De Boekclassificatie**: zes verboden boeken in chronologische volgorde (jaartal) aanklikken; de eerste letters van elk boek vormen samen een woord.
-3. **Laag III — Het Waszegelarchief**: vier fragmenten koppelen aan het juiste adellijke huis op basis van het beschreven wapendier; elk huis levert een cijfer.
-4. **Laag IV — De Manuscriptvertaling**: een geheimschrift (symbool-naar-letter legenda) ontcijferen tot een woord, ingevoerd via een formulier.
-5. **Laag V — De Finale Reeks**: de Meestercode combineren uit fragmenten van de vorige vier lagen volgens een expliciete formule, en invoeren om de kluis te openen.
+2. **Laag II — Het Waszegelarchief**: vier fragmenten koppelen aan het juiste adellijke huis op basis van het beschreven wapendier; elk huis levert een cijfer.
+3. **Laag III — De Manuscriptvertaling**: een geheimschrift (symbool-naar-letter legenda) ontcijferen tot een woord, ingevoerd via een formulier.
+4. **Laag IV — De Finale Reeks**: de Meestercode combineren uit fragmenten van de vorige drie lagen volgens een expliciete formule, en invoeren om de kluis te openen.
 
 ### Hintsysteem (optioneel, wel toegevoegd)
 
@@ -68,11 +67,11 @@ Visuele stijl: gotische archief/bibliotheek-esthetiek (perkament, koper/goud, ka
 | Vereiste | Toepassing in De Verboden Kluis |
 |---|---|
 | DOM-manipulatie | Renderen van elke laag, voortgangsindicator (dots), aanwijzingen-zijbalk, leaderboard |
-| Eventhandlers | Klik-events op wielen/boeken/zegels, submit-events op formulieren |
+| Eventhandlers | Klik-events op wielen/zegels, submit-events op formulieren |
 | Alleen arrow functions | Volledige `script.js` is één IIFE (`(() => {...})()`) met uitsluitend arrow functions |
 | Formulieren | Manuscriptvertaling, Meestercode-invoer en naam-voor-leaderboard via `FormData` + `Object.fromEntries()` |
 | localStorage | Array van beste tijden (leaderboard) |
 | `setInterval()` | Countdown timer (zuiveringsprocedure aftellen) |
 | `setTimeout()` | Vertraagde overgang naar volgende laag, hersteltijd na foute invoer, hint-shake |
 | CSS-animaties | Fakkelflikkering, pulserende voortgangsstip, shake bij foute input, wiegende kettingen, kluisdeur die open schuift |
-| Micro-interacties | Hover/press states op knoppen en boekkaarten, glow bij voortgang, timer die rood pulseert onder 60 seconden |
+| Micro-interacties | Hover/press states op knoppen en zegelkaarten, glow bij voortgang, timer die rood pulseert onder 60 seconden |

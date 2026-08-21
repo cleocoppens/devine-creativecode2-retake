@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>De Verboden Kluis — Escape Room</title>
+<title>De Verboden Kluis: Escape Room</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -20,13 +20,12 @@
     <div class="layers-scroll parchment-texture">
       <span class="ink-blot" style="width:16px;height:16px;bottom:14px;right:12px;"></span>
       <span class="ink-spatter" style="width:2px;height:2px;bottom:34px;right:26px;"></span>
-      <h4>Vijf Beveiligingslagen</h4>
+      <h4>Vier Beveiligingslagen</h4>
       <ul>
         <li><span class="ls-icon">I</span>Coderadepuzzel</li>
-        <li><span class="ls-icon">II</span>Boekclassificatie</li>
-        <li><span class="ls-icon">III</span>Waszegelarchief</li>
-        <li><span class="ls-icon">IV</span>Manuscriptvertaling</li>
-        <li><span class="ls-icon">V</span>De Finale Reeks</li>
+        <li><span class="ls-icon">II</span>Waszegelarchief</li>
+        <li><span class="ls-icon">III</span>Manuscriptvertaling</li>
+        <li><span class="ls-icon">IV</span>De Finale Reeks</li>
       </ul>
     </div>
 
@@ -40,7 +39,7 @@
         de gangen: <em>"Indringer gedetecteerd. Zuiveringsprocedure gestart."</em>
         <br><br>
         Het eeuwenoude bewakingssysteem van het archief heeft je gevonden.
-        Vijf beveiligingslagen scheiden je van de uitgang. Ontcijfer ze, of blijf voor
+        Vier beveiligingslagen scheiden je van de uitgang. Ontcijfer ze, of blijf voor
         altijd onderdeel van de collectie.
       </div>
       <div class="btn-row">
@@ -57,7 +56,7 @@
       <div class="progress-dots" id="progress-dots"></div>
       <div class="timer-wrap" id="timer-display">
         <span class="timer-label">Tijd tot zuivering</span>
-        05:00
+        03:00
       </div>
       <div class="hint-area">
         <button class="hint-btn" id="btn-hint" type="button">💡 Hint (<span id="hints-left">3</span> over)</button>
@@ -65,7 +64,7 @@
     </header>
     <div class="game-main">
       <!-- #layer-content is leeg in de HTML: script.js vult dit per laag
-           met de juiste puzzel-markup (renderLayer1 t/m renderLayer5) -->
+           met de juiste puzzel-markup (renderLayer1 t/m renderLayer4) -->
       <div id="layer-content"></div>
       <aside class="clues-sidebar">
         <h3>Verzamelde Aanwijzingen</h3>
@@ -83,7 +82,7 @@
       <div class="vault-door"><div class="panel left"></div><div class="panel right"></div></div>
       <h1>Ontsnapt</h1>
       <p>De kluisdeur glijdt open. Boven je hoofd dooft het rode alarmlicht.
-      Het systeem zwijgt — voorlopig.</p>
+      Het systeem zwijgt, voorlopig.</p>
       <div class="final-time" id="final-time">00:00</div>
       <form class="score-form" id="score-form">
         <label for="score-name" class="visually-hidden">Naam voor het archief</label>
